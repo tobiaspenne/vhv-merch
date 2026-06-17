@@ -337,6 +337,14 @@
     .co-dform-outer { background: #F5F5F5; padding: 6px; border-radius: 6px; margin-top: 28px; margin-bottom: 32px; position: relative; }
     /* Zacke: schlanke, saubere Pfeilspitze, die direkt aus dem F5F5F5-Außenrahmen wächst */
     .co-dtab-notch { position: absolute; bottom: 100%; transform: translateX(-50%); left: 16.67%; width: 0; height: 0; border-left: 9px solid transparent; border-right: 9px solid transparent; border-bottom: 8px solid #F5F5F5; pointer-events: none; }
+    /* Zahlungsart-Tabs (horizontal, Step 2) – Mechanik analog Versand */
+    .co-ptabs-wrap { position: relative; }
+    .co-ptabs { display: flex; flex-direction: row; border: 1px solid var(--g20); border-radius: 4px; overflow: hidden; }
+    .co-ptab { flex: 1; display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 12px; padding: 18px 12px; border-right: 1px solid var(--g20); cursor: pointer; background: #fff; user-select: none; font-size: 16px; line-height: 22px; color: #405164; text-align: center; }
+    .co-ptab:last-child { border-right: none; }
+    .co-ptab.sel { background: #F5F6F7; }
+    /* Klickbare Prozessnavigation: erledigte Schritte als Link */
+    .co-step.completed:hover { text-decoration: underline; }
     /* Inneres Formular-Panel */
     .co-dform-wrap { border: 1px solid var(--g20); border-radius: 4px; padding: 24px; background: #fff; }
     .co-lbl { font-size: 20px; font-weight: 500; line-height: 28px; color: #405164; margin-bottom: 20px; }
@@ -1216,7 +1224,32 @@
       s.classList.toggle('completed', done);
       if (done) s.innerHTML = CHECK_SVG + STEP_NAMES[i];
       else s.textContent = STEP_LABELS[i];
+      // Nur bereits abgeschlossene Schritte sind anklickbar (zurück navigieren)
+      s.style.cursor = done ? 'pointer' : 'default';
     });
+    // Zacke im Bezahl-Schritt korrekt positionieren, sobald sichtbar
+    if (checkoutStep === 2) {
+      requestAnimationFrame(() => {
+        const sel = document.querySelector('#co-step2 .co-ptab.sel') || document.querySelector('#co-step2 .co-ptab');
+        positionPaymentCaret(sel);
+      });
+    }
+  }
+  /* Prozessnavigation: zu einem bereits durchlaufenen Schritt zurückspringen */
+  function goToCheckoutStep(target) {
+    if (target === checkoutStep || target < 1 || target > 3) return;
+    if (target > checkoutStep) return; // nicht nach vorne springen
+    const steps = [null,
+      document.getElementById('co-step1'),
+      document.getElementById('co-step2'),
+      document.getElementById('co-step3')
+    ];
+    steps[checkoutStep].style.display = 'none';
+    checkoutStep = target;
+    steps[checkoutStep].style.display = 'block';
+    if (checkoutStep === 3) renderStep3();
+    updateCheckoutUI();
+    window.scrollTo({top:0,behavior:'instant'});
   }
   function renderStep3() {
     const el = document.getElementById('co3-items');
@@ -1287,6 +1320,24 @@
     [0, 1, 2].forEach(i => {
       document.getElementById('co-pay-' + i).style.display = i === idx ? 'block' : 'none';
     });
+  }
+  function positionPaymentCaret(tabEl) {
+    const notch = document.getElementById('payment-notch');
+    const outer = document.getElementById('co-payment-outer');
+    if (!notch || !outer || !tabEl) return;
+    const o = outer.getBoundingClientRect();
+    const t = tabEl.getBoundingClientRect();
+    notch.style.left = (t.left - o.left + t.width / 2) + 'px';
+  }
+  function selectPaymentTab(el, idx) {
+    document.querySelectorAll('#co-step2 .co-ptab').forEach(t => {
+      t.classList.remove('sel');
+      const rd = t.querySelector('.co-rd'); if (rd) rd.style.display = 'none';
+    });
+    el.classList.add('sel');
+    const rd = el.querySelector('.co-rd'); if (rd) rd.style.display = 'block';
+    updatePaymentForm(idx);
+    positionPaymentCaret(el);
   }
   function toggleVoucher(cb, id) {
     const row = document.getElementById(id);
@@ -1439,9 +1490,9 @@
       <h1 class="co-title">Ihre Bestellung</h1>
       <p class="co-subtitle">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor.</p>
       <div class="co-steps">
-        <div class="co-step active">1. Versand</div>
-        <div class="co-step">2. Bezahlung</div>
-        <div class="co-step">3. Bestellung abschließen</div>
+        <div class="co-step active" onclick="goToCheckoutStep(1)">1. Versand</div>
+        <div class="co-step" onclick="goToCheckoutStep(2)">2. Bezahlung</div>
+        <div class="co-step" onclick="goToCheckoutStep(3)">3. Bestellung abschließen</div>
       </div>
       <!-- 6px Fortschrittsbalken, abgerundet, 8px Gap -->
       <div class="co-bars">
@@ -1566,47 +1617,57 @@
         <div id="co-step2" style="display:none;">
           <div class="co-lbl">Welche Zahlungsweise bevorzugen Sie?</div>
 
-          <!-- Zahlungsoptionen als vertikale Liste -->
-          <div class="co-delivery">
-            <div class="co-radio sel" onclick="selectRadio(this); updatePaymentForm(0)">
-              <div class="co-rc"><div class="co-rd"></div></div>Kostenstelle
-            </div>
-            <div class="co-radio" onclick="selectRadio(this); updatePaymentForm(1)">
-              <div class="co-rc"><div class="co-rd" style="display:none"></div></div>Projektstrukturplanelement
-            </div>
-            <div class="co-radio" onclick="selectRadio(this); updatePaymentForm(2)">
-              <div class="co-rc"><div class="co-rd" style="display:none"></div></div>Personalnummer
+          <!-- Zahlungsart-Tabs: horizontale Radio-Segmente, Mechanik analog Versand -->
+          <div class="co-ptabs-wrap">
+            <div class="co-ptabs">
+              <div class="co-ptab sel" onclick="selectPaymentTab(this, 0)">
+                <div class="co-rc"><div class="co-rd"></div></div>
+                <span class="co-ptab-lbl">Kostenstelle</span>
+              </div>
+              <div class="co-ptab" onclick="selectPaymentTab(this, 1)">
+                <div class="co-rc"><div class="co-rd" style="display:none"></div></div>
+                <span class="co-ptab-lbl">Projektstrukturplanelement</span>
+              </div>
+              <div class="co-ptab" onclick="selectPaymentTab(this, 2)">
+                <div class="co-rc"><div class="co-rd" style="display:none"></div></div>
+                <span class="co-ptab-lbl">Personalnummer</span>
+              </div>
             </div>
           </div>
 
-          <!-- Dynamisches Eingabefeld je nach Zahlungsart -->
-          <div id="co-pay-0">
-            <div class="co-lbl">Kostenstelle</div>
-            <input class="co-fld-inp" type="text" placeholder="z.B. NW-847-00896-1">
-            <label class="co-check" style="margin-top:8px;"><input type="checkbox" onchange="toggleVoucher(this, 'voucher-0')">Geschenkgutschein-Code anwenden</label>
-            <div id="voucher-0" class="co-voucher">
-              <input type="text" placeholder="XXXX-XXX-XXX-XXXXX-X">
-              <button class="btn-voucher">Anwenden</button>
-            </div>
-          </div>
-          <div id="co-pay-1" style="display:none">
-            <div class="co-lbl">Projektstrukturplanelement</div>
-            <input class="co-fld-inp" type="text" placeholder="z.B. PSP-2024-001">
-            <label class="co-check" style="margin-top:8px;"><input type="checkbox" onchange="toggleVoucher(this, 'voucher-1')">Geschenkgutschein-Code anwenden</label>
-            <div id="voucher-1" class="co-voucher">
-              <input type="text" placeholder="XXXX-XXX-XXX-XXXXX-X">
-              <button class="btn-voucher">Anwenden</button>
-            </div>
-          </div>
-          <div id="co-pay-2" style="display:none">
-            <div class="co-lbl">Personalnummer</div>
-            <input class="co-fld-inp" type="text" placeholder="z.B. 12345678">
-            <label class="co-check" style="margin-top:8px;"><input type="checkbox" onchange="toggleVoucher(this, 'voucher-2')">Geschenkgutschein-Code anwenden</label>
-            <div id="voucher-2" class="co-voucher">
-              <input type="text" placeholder="XXXX-XXX-XXX-XXXXX-X">
-              <button class="btn-voucher">Anwenden</button>
-            </div>
-          </div>
+          <!-- Gerahmtes Panel + Zacke, analog Versand -->
+          <div class="co-dform-outer" id="co-payment-outer">
+            <div class="co-dtab-notch" id="payment-notch"></div>
+            <div class="co-dform-wrap">
+              <div id="co-pay-0">
+                <div class="co-lbl" style="font-size:16px;font-weight:500;margin-bottom:16px;">Kostenstelle</div>
+                <input class="co-fld-inp" type="text" placeholder="z.B. NW-847-00896-1">
+                <label class="co-check" style="margin-top:8px;"><input type="checkbox" onchange="toggleVoucher(this, 'voucher-0')">Geschenkgutschein-Code anwenden</label>
+                <div id="voucher-0" class="co-voucher">
+                  <input type="text" placeholder="XXXX-XXX-XXX-XXXXX-X">
+                  <button class="btn-voucher">Anwenden</button>
+                </div>
+              </div>
+              <div id="co-pay-1" style="display:none">
+                <div class="co-lbl" style="font-size:16px;font-weight:500;margin-bottom:16px;">Projektstrukturplanelement</div>
+                <input class="co-fld-inp" type="text" placeholder="z.B. PSP-2024-001">
+                <label class="co-check" style="margin-top:8px;"><input type="checkbox" onchange="toggleVoucher(this, 'voucher-1')">Geschenkgutschein-Code anwenden</label>
+                <div id="voucher-1" class="co-voucher">
+                  <input type="text" placeholder="XXXX-XXX-XXX-XXXXX-X">
+                  <button class="btn-voucher">Anwenden</button>
+                </div>
+              </div>
+              <div id="co-pay-2" style="display:none">
+                <div class="co-lbl" style="font-size:16px;font-weight:500;margin-bottom:16px;">Personalnummer</div>
+                <input class="co-fld-inp" type="text" placeholder="z.B. 12345678">
+                <label class="co-check" style="margin-top:8px;"><input type="checkbox" onchange="toggleVoucher(this, 'voucher-2')">Geschenkgutschein-Code anwenden</label>
+                <div id="voucher-2" class="co-voucher">
+                  <input type="text" placeholder="XXXX-XXX-XXX-XXXXX-X">
+                  <button class="btn-voucher">Anwenden</button>
+                </div>
+              </div>
+            </div><!-- /co-dform-wrap -->
+          </div><!-- /co-payment-outer -->
 
           <!-- Hinweisbox Lieferzeit -->
           <div class="co-pickup-box" style="margin-top:32px;">
