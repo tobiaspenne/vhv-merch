@@ -1,0 +1,1715 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VHV Gruppe – Merchandise Shop</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --orange:  #FA5F07;
+      --green:   #B7BF00;
+      --navy:    #405164;
+      --dark:    #283747;
+      --gbg:     #F5F6F7;
+      --g20:     #DADCE0;
+      --g50:     #9FA8B2;
+      --g60:     #8C97A2;
+      --gtxt:    #697481;
+      --tn:      #0E2546;
+      --tr:      #C51101;
+      --tc:      #3DB7E4;
+      --ta:      #F1AB01;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { overflow-x: clip; }
+    body { font-family: 'Roboto', sans-serif; color: var(--navy); background: #fff; width: 100%; }
+    .screen { width: 100%; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ── HEADER ── */
+    .header {
+      position: sticky; top: 0; z-index: 300;
+      height: 72px; background: #fff;
+      border-bottom: none; /* border only when scrolled (see JS) */
+    }
+    .header.scrolled { border-bottom: 1px solid var(--g20); }
+    .hdr-inner {
+      max-width: 1272px; margin: 0 auto; padding: 0 24px;
+      height: 100%;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    /* Home header: not sticky, green background blends into hero */
+    /* Header schwebt über der Bühne, grüner Hintergrund kommt vom Hero */
+    #screen-home .header { position: absolute; top: 0; left: 0; right: 0; background: transparent; border: none; z-index: 10; }
+    /* Hero deckt den gesamten Stage ab (582px = BG-Höhe lt. Figma), Header ist absolute */
+    #screen-home .hero { margin-top: 0; height: 582px; }
+    /* hero-txt und tw: defaults gelten (top:146px bzw. top:0) — kein Override nötig */
+    .logo { cursor: pointer; display: inline-flex; align-items: center; }
+    .logo img { height: 32px; width: auto; display: block; }
+    .hdr-btns { display: flex; gap: 12px; }
+    .btn-hdr {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 16px; background: var(--orange); color: #fff;
+      font-size: 16px; font-weight: 500; border-radius: 4px; white-space: nowrap;
+    }
+    .btn-hdr svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--green);
+      height: 582px; position: relative;
+      overflow: hidden;
+      margin-top: -72px; /* slide behind sticky header */
+    }
+    .hero-inner {
+      max-width: 1272px; margin: 0 auto; padding: 0 24px;
+      height: 100%; position: relative;
+    }
+    /* Heading block: positioned within .hero-inner */
+    .hero-txt {
+      position: absolute; left: 24px; top: 146px; width: min(605px, 50%);
+      display: flex; flex-direction: column; gap: 32px;
+    }
+    .hero-h1 {
+      font-size: 60px; font-weight: 700; line-height: 72px;
+      letter-spacing: -1.2px; color: #fff;
+    }
+    .hero-sub { font-size: 24px; font-weight: 400; line-height: 32px; color: #fff; }
+    .btn-hero {
+      display: inline-flex; align-items: center; gap: 8px;
+      min-height: 56px; padding: 16px;
+      background: var(--orange); color: #fff;
+      font-size: 18px; font-weight: 500; line-height: 26px;
+      border-radius: 4px; align-self: flex-start;
+    }
+
+    /* Tiles: right-aligned to screen edge, always */
+    .tw { position: absolute; right: 0; top: 0; width: 730px; pointer-events: none; }
+    /* 146px (rounded up from 145.546) + integer steps = no sub-pixel gaps */
+    .t  { position: absolute; width: 146px; height: 146px; }
+
+    /* ── PROMO CARD ──
+       In normal doc flow after .hero, pulled up with negative margin.
+       margin-left: calc(50% - 636px) aligns to left edge of centered 1272px grid. */
+    .hero-promo {
+      position: relative; z-index: 10;
+      margin-top: -90px;
+      margin-left: clamp(24px, calc(50% - 612px), calc(100% - 582px));
+      width: 558px;
+      height: 253px;
+      background: #fff;
+      border: 1px solid var(--g20);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.10);
+      padding: 32px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .promo-icon { width: 40px; height: 40px; }
+    .promo-ttl { font-size: 22px; font-weight: 500; line-height: 30px; color: var(--navy); }
+    .promo-lnk { color: var(--orange); font-size: 16px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+
+    /* ── SECTIONS ── */
+    .section { padding: 120px 0; }
+    /* Centered content container — same as grid width */
+    .cnt { width: min(1272px, 100%); max-width: 1272px; margin: 0 auto; padding: 0 24px; }
+
+    .sec-title { font-size: 40px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
+    .sec-sub   { font-size: 18px; line-height: 26px; color: var(--gtxt); margin-bottom: 40px; }
+
+    /* Product grid: exactly 392px cards, 48px gap, total 1272px */
+    .pgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px; }
+
+    /* "Mehr anzeigen": 56px below last row, right-aligned to grid */
+    .mehr-row { margin-top: 56px; display: flex; justify-content: flex-end; }
+    .btn-mehr { color: var(--orange); font-size: 18px; font-weight: 500; cursor: pointer; }
+    .btn-mehr:hover { text-decoration: underline; }
+
+    /* Product card */
+    .card { display: flex; flex-direction: column; gap: 24px; cursor: pointer; }
+    .cimg {
+      width: 100%; aspect-ratio: 1;
+      background: var(--gbg); position: relative;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .cimg img {
+      width: 56%; height: 56%; object-fit: contain;
+      transform: rotate(0.34deg);
+      transition: transform .25s ease;
+    }
+    .card:hover .cimg img { transform: rotate(0.34deg) scale(1.06); }
+    .cbadge {
+      position: absolute; top: 16px; left: 16px; z-index: 2;
+      background: #fff; font-size: 14px; font-weight: 500;
+      color: var(--navy); padding: 4px 8px; border-radius: 4px;
+    }
+    .cbody { display: flex; flex-direction: column; gap: 16px; }
+    .cname  { font-size: 22px; font-weight: 500; line-height: 28px; }
+    .cdesc  { font-size: 18px; line-height: 26px; }
+    .cvar   { font-size: 18px; line-height: 26px; color: var(--g50); }
+    .cprice { font-size: 24px; font-weight: 500; line-height: 32px; border-top: 1px solid var(--g20); padding-top: 24px; }
+    .cavail { font-size: 16px; line-height: 22px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .dot    { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .dg { background: #2AAB51; }
+    .dy { background: #E8A000; }
+    .pin { width: 16px; height: 16px; }
+
+    /* ── ONBOARDING: width same as content section (1272px), grey box ── */
+    .onb-box  { background: var(--gbg); display: flex; align-items: center; position: relative; }
+    .onb-img  { width: 393px; min-height: 303px; flex-shrink: 0; overflow: hidden; }
+    .onb-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .onb-body { flex: 1; padding: 40px; display: flex; flex-direction: column; gap: 24px; justify-content: center; }
+    /* Badge: absolute on the entire box, top-right with equal 24px inset */
+    .onb-chip { position: absolute; top: 24px; right: 24px; background: #B7BF00; color: #fff; border: none; border-radius: 4px; padding: 6px 8px; font-size: 14px; font-weight: 500; white-space: nowrap; }
+    .onb-ttl  { font-size: 22px; font-weight: 500; line-height: 1.4; }
+    .onb-sub  { font-size: 18px; line-height: 26px; color: var(--gtxt); }
+    .onb-lnk  { color: var(--orange); font-size: 18px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+
+    /* ── FAQ: centered 1272px, left col 392px + right col flex-1=880px ── */
+    .faq-wrap { padding: 120px 0; }
+    .faq-cnt  { max-width: 1272px; margin: 0 auto; display: flex; padding: 0 24px; box-sizing: border-box; }
+    .faq-l { width: 392px; flex-shrink: 0; display: flex; flex-direction: column; gap: 24px; padding-right: 80px; }
+    .faq-h  { font-size: 48px; font-weight: 900; line-height: 1.1; }
+    .faq-s  { font-size: 24px; line-height: 32px; color: var(--gtxt); }
+    .btn-faq { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 12px 16px; background: var(--orange); color: #fff; font-size: 16px; font-weight: 500; border-radius: 4px; align-self: flex-start; }
+    .faq-r    { flex: 1; display: flex; flex-direction: column; gap: 24px; } /* 880px */
+    .faq-item { background: var(--gbg); padding: 24px; display: flex; align-items: center; gap: 48px; }
+    .faq-q    { font-size: 20px; font-weight: 500; line-height: 1.6; flex: 1; }
+    .faq-btn  { width: 32px; height: 32px; border-radius: 50%; background: var(--orange); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+
+    /* ── BADGE FARBEN ── */
+    .cbadge-green { background: #B7BF00; color: #fff; border: none; }
+    .cbadge-red   { background: #C51101; color: #fff; border: none; }
+    .cbadge-amber { background: #F1AB01; color: #fff; border: none; }
+
+    /* ── FOOTER ── */
+    /* Footer-Wrapper: positioniert ft-tw als Geschwister des Footers */
+    .footer-wrapper { position: relative; }
+    .footer { background: var(--dark); position: relative; overflow: hidden; }
+    .ft-inner { max-width: 1272px; margin: 0 auto; padding: 56px 24px; display: flex; align-items: center; justify-content: space-between; }
+    .ft-l { display: flex; flex-direction: column; gap: 20px; }
+    .ft-q { font-size: 22px; font-weight: 500; line-height: 1.4; color: #fff; max-width: 380px; }
+    .ft-q em { color: var(--green); font-style: normal; }
+    .ft-contact { display: flex; align-items: center; gap: 10px; color: #fff; font-size: 16px; font-weight: 500; cursor: pointer; }
+    .ft-c { display: flex; flex-direction: column; gap: 16px; }
+    .ft-socials { display: flex; gap: 16px; align-items: center; }
+    .ft-icon { width: 44px; height: 44px; border: 2px solid rgba(255,255,255,0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0.85; cursor: pointer; }
+    .ft-icon:hover { opacity: 1; border-color: #fff; }
+    .ft-links { color: #dadce0; font-size: 14px; line-height: 1.6; }
+    .ft-copy { color: #9fa8b2; font-size: 14px; }
+    /* Kacheln: Geschwister des Footers, ragen 72px über Footer-Oberkante */
+    .ft-tw { position: absolute; right: 0; bottom: 0; top: -72px; width: 288px; pointer-events: none; }
+    .ft-t  { position: absolute; width: 72px; height: 72px; }
+
+    /* ── PLP ── */
+    .plp-head { padding: 48px 0 0; }
+    .plp-hi   { max-width: 1272px; margin: 0 auto; padding: 0 24px; }
+    /* Filter-Bar: exakt aus Figma — grauer Container, alle Tabs gleich groß */
+    .fbar {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 32px; margin-bottom: 48px;
+      background: #f5f6f7; border-radius: 100px;
+      padding: 6px; width: 100%;
+    }
+    .ftab {
+      flex: none; text-align: center;
+      padding: 10px 16px; border-radius: 44px;
+      font-size: 16px; font-weight: 400; line-height: 24px;
+      color: #8c97a2; cursor: pointer; white-space: nowrap;
+      background: #f5f6f7; border: none;
+      transition: background .15s, color .15s;
+    }
+    .ftab.active { background: var(--orange); color: #fff; }
+
+
+    /* Sort Bar */
+    .sort-bar { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-bottom: 24px; }
+    .sort-lbl { font-size: 16px; color: #9FA8B2; }
+    .sort-sel {
+      padding: 10px 40px 10px 16px; border: 1px solid var(--g20); border-radius: 4px;
+      font-size: 16px; font-weight: 500; color: #405164; font-family: inherit;
+      -webkit-appearance: none; appearance: none; cursor: pointer; outline: none;
+      background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239FA8B2' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 12px center;
+    }
+    .sort-sel:focus { border-color: var(--orange); }
+    /* Card animation helper */
+    .card { transition: opacity 0.2s, transform 0.2s; }
+
+    /* "Mehr laden" mit Linien links/rechts */
+    .ml-row { display: flex; align-items: center; gap: 23px; margin-top: 64px; }
+    .ml-line { flex: 1; height: 2px; background: #dadce0; }
+    .ml-btn { color: var(--orange); font-size: 18px; font-weight: 500; line-height: 26px; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; background: none; border: none; font-family: inherit; }
+
+    /* ── PDP ── */
+    .pdp-page { padding-top: 56px; display: flex; flex-direction: column; align-items: center; gap: 72px; }
+    .pdp-w    { max-width: 1272px; margin: 0 auto; width: 100%; padding: 0 24px; box-sizing: border-box; }
+    .back     { display: inline-flex; align-items: center; gap: 8px; color: var(--orange); font-size: 18px; font-weight: 500; cursor: pointer; margin-bottom: 40px; }
+    .pdp-prod { display: flex; gap: 48px; align-items: stretch; }
+    .pdp-mi   { width: 612px; height: 612px; flex-shrink: 0; background: var(--gbg); display: flex; align-items: center; justify-content: center; position: relative; }
+    .pdp-mi img { width: 66%; height: 66%; object-fit: contain; transform: rotate(0.34deg); }
+    .pdp-badge { position: absolute; top: 24px; left: 24px; background: #fff; border-radius: 4px; color: var(--navy); font-size: 14px; font-weight: 500; padding: 4px 8px; }
+    .pdp-thumbs { display: flex; gap: 24px; margin-top: 16px; }
+    .pdp-th { width: 96px; height: 96px; background: var(--gbg); cursor: pointer; display: flex; align-items: center; justify-content: center; border: 2px solid transparent; }
+    .pdp-th.active { border-color: var(--orange); }
+    .pdp-th img { width: 65%; height: 65%; object-fit: contain; transform: rotate(0.34deg); }
+    .pdp-det { flex: 1; display: flex; flex-direction: column; gap: 24px; }
+    .pdp-artnr { font-size: 16px; color: var(--g50); }
+    .pdp-ttl { font-size: 24px; font-weight: 500; line-height: 32px; }
+    .pdp-av { display: flex; align-items: center; gap: 10px; font-size: 16px; }
+    .pdp-meta { display: flex; align-items: center; justify-content: space-between; }
+    .pdp-div { border: none; border-top: 1px solid var(--g20); }
+    .pdp-var { font-size: 16px; color: var(--g60); line-height: 24px; }
+    .pdp-price-row { display: flex; align-items: baseline; gap: 12px; padding-top: 8px; }
+    .pdp-pr { font-size: 28px; font-weight: 700; color: var(--dark); }
+    .pdp-pu { font-size: 16px; color: var(--g60); }
+    .pdp-ship { font-size: 14px; color: var(--g60); }
+    .pdp-size-wrap { position: relative; display: none; padding-top: 16px; }
+    .pdp-size-wrap.visible { display: block; }
+    .pdp-size {
+      width: 100%; height: 56px;
+      appearance: none; -webkit-appearance: none;
+      border: 1px solid var(--g20); border-radius: 4px;
+      padding: 0 48px 0 16px;
+      font-size: 16px; font-family: inherit; color: var(--g60);
+      background: #fff; cursor: pointer;
+    }
+    .pdp-size:focus { outline: 2px solid var(--orange); outline-offset: -1px; }
+    .pdp-size.selected { color: var(--navy); }
+    .pdp-size-chevron { position: absolute; right: 16px; top: 44px; transform: translateY(-50%); pointer-events: none; }
+    .pdp-qr  { display: flex; align-items: center; gap: 16px; padding-top: 16px; }
+    .pdp-qty { display: flex; align-items: center; border: 1px solid var(--g20); border-radius: 4px; overflow: hidden; height: 56px; flex-shrink: 0; }
+    .qbtn { width: 56px; height: 56px; background: #fff; color: var(--orange); font-size: 20px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+    .qbtn:hover { background: var(--gbg); }
+    .qinp { width: 56px; height: 56px; border: none; border-left: 1px solid var(--g20); border-right: 1px solid var(--g20); text-align: center; font-size: 16px; font-family: inherit; color: var(--navy); padding: 0; line-height: 56px; display: block; -moz-appearance: textfield; }
+    .qinp::-webkit-inner-spin-button, .qinp::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    .qinp:focus { outline: none; }
+    .btn-cart { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 16px; padding: 16px; background: var(--orange); color: #fff; font-size: 18px; font-weight: 500; border-radius: 4px; height: 56px; }
+    .btn-dl { display: inline-flex; align-items: center; gap: 8px; color: var(--orange); font-size: 16px; font-weight: 500; padding-top: 8px; }
+    .pdp-info { display: flex; flex-direction: column; gap: 16px; padding-top: 24px; }
+    .pdp-it { font-size: 18px; font-weight: 500; }
+    .pdp-tx { font-size: 18px; line-height: 26px; }
+    .mehr-lnk { color: var(--orange); font-weight: 500; cursor: pointer; }
+    .info-x { max-height: 0; overflow: hidden; transition: max-height 0.45s ease; }
+    .info-x.open { max-height: 800px; }
+    .pdp-rel { width: 100%; max-width: 1272px; margin: 0 auto; padding: 56px 24px 80px; border-top: 1px solid var(--g20); box-sizing: border-box; }
+    .pdp-rel h2 { font-size: 30px; font-weight: 500; margin-bottom: 32px; }
+    .rel-grid { display: flex; justify-content: space-between; gap: 24px; }
+    .rcrd { display: flex; flex-direction: column; gap: 24px; cursor: pointer; width: 392px; }
+    .rimg { width: 392px; height: 392px; background: var(--gbg); position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .rimg img { width: 56%; height: 56%; object-fit: contain; transform: rotate(0.34deg); transition: transform .25s ease; }
+    .rcrd:hover .rimg img { transform: rotate(0.34deg) scale(1.06); }
+
+    /* ── CHECKOUT ── */
+    .co-page { padding: 64px 0 120px; }
+    .co-wrap { max-width: 1272px; margin: 0 auto; display: flex; gap: 64px; align-items: flex-start; padding: 0 24px; box-sizing: border-box; }
+    .co-main { flex: 1; min-width: 0; }
+    .co-side { width: 360px; flex-shrink: 0; }
+    .co-title { font-size: 48px; font-weight: 700; line-height: 56px; color: #405164; margin-bottom: 12px; }
+    .co-subtitle { font-size: 18px; line-height: 26px; color: #697481; margin-bottom: 0; }
+    /* Steps span full width above the 2-col layout */
+    .co-top { max-width: 1272px; margin: 0 auto; padding: 0 24px; }
+    .co-steps { display: flex; margin: 40px 0 0; }
+    .co-step { flex: 1; padding-bottom: 14px; text-align: center; font-size: 16px; line-height: 22px; font-weight: 400; color: #9FA8B2; }
+    .co-step.active { font-weight: 500; color: var(--green); }
+    .co-step.completed { font-weight: 500; color: var(--green); display: flex; align-items: center; justify-content: center; gap: 6px; }
+    /* 6px abgerundete Fortschrittsbalken, 8px Gap */
+    .co-bars { display: flex; gap: 8px; margin-top: 0; }
+    .co-bar { flex: 1; height: 6px; background: #DADCE0; border-radius: 3px; }
+    .co-bar.active { background: var(--green); }
+    /* Lieferoptionen (vertikale Liste – Step 2 Zahlung) */
+    .co-delivery { display: flex; flex-direction: column; gap: 0; margin-bottom: 32px; border: 1px solid var(--g20); border-radius: 4px; overflow: hidden; }
+    .co-delivery .co-radio { border: none; border-bottom: 1px solid var(--g20); border-radius: 0; padding: 16px 20px; }
+    .co-delivery .co-radio:last-child { border-bottom: none; }
+    .co-delivery .co-radio.sel { outline: none; border-color: var(--g20); background: #F5F6F7; }
+    /* Lieferoptionen Tabs (horizontal, Step 1) */
+    .co-dtabs-wrap { position: relative; }
+    .co-dtabs { display: flex; flex-direction: row; border: 1px solid var(--g20); border-radius: 4px; overflow: hidden; }
+    .co-dtab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 20px 12px; border-right: 1px solid var(--g20); cursor: pointer; background: #fff; user-select: none; }
+    .co-dtab:last-child { border-right: none; }
+    .co-dtab.sel { background: #F5F6F7; }
+    .co-dtab-icon { color: #9FA8B2; line-height: 0; }
+    .co-dtab-lbl { font-size: 15px; line-height: 20px; color: #405164; text-align: center; }
+    /* Aktiver Tab: nur grau hinterlegt — Label/Icon bleiben unverändert */
+    /* Außenrahmen + Zacke-Wrapper */
+    .co-dform-outer { background: #F5F5F5; padding: 6px; border-radius: 6px; margin-top: 28px; margin-bottom: 32px; position: relative; }
+    /* Zacke: schlanke, saubere Pfeilspitze, die direkt aus dem F5F5F5-Außenrahmen wächst */
+    .co-dtab-notch { position: absolute; bottom: 100%; transform: translateX(-50%); left: 16.67%; width: 0; height: 0; border-left: 9px solid transparent; border-right: 9px solid transparent; border-bottom: 8px solid #F5F5F5; pointer-events: none; }
+    /* Inneres Formular-Panel */
+    .co-dform-wrap { border: 1px solid var(--g20); border-radius: 4px; padding: 24px; background: #fff; }
+    .co-lbl { font-size: 20px; font-weight: 500; line-height: 28px; color: #405164; margin-bottom: 20px; }
+    .co-radios { display: flex; gap: 16px; margin-bottom: 24px; width: 100%; }
+    .co-radio { flex: 1; padding: 14px 16px; border: 1px solid var(--g20); border-radius: 4px; display: flex; align-items: center; gap: 12px; cursor: pointer; font-size: 16px; line-height: 22px; color: #405164; transition: border-color .15s; user-select: none; }
+    .co-radio.sel { background: #F5F6F7; }
+    .co-delivery .co-radio.sel { background: #F5F6F7; }
+    .co-rc { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #DADCE0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .co-rd { width: 10px; height: 10px; border-radius: 50%; background: var(--orange); }
+    .fld { position: relative; margin-bottom: 16px; }
+    .fld-row { display: flex; gap: 16px; margin-bottom: 16px; }
+    .fld-row .fld { flex: 1; margin-bottom: 0; }
+    .fld input { width: 100%; border: 1px solid var(--g20); border-radius: 4px; padding: 22px 16px 8px; font-size: 16px; line-height: 22px; font-family: inherit; color: #405164; background: #fff; outline: none; transition: border-color .15s; }
+    .fld input:focus { border-color: var(--orange); }
+    .fld label { position: absolute; top: 50%; left: 16px; transform: translateY(-50%); font-size: 16px; color: #9FA8B2; pointer-events: none; transition: top .15s, font-size .15s, transform .15s; }
+    .fld input:focus + label, .fld input:not(:placeholder-shown) + label { top: 10px; transform: none; font-size: 12px; }
+    /* Custom Checkbox */
+    .co-check { display: flex; align-items: center; gap: 12px; margin-top: 24px; font-size: 16px; line-height: 22px; color: #405164; cursor: pointer; }
+    .co-check input[type="checkbox"] {
+      -webkit-appearance: none; appearance: none;
+      width: 20px; height: 20px; flex-shrink: 0;
+      border: 2px solid #DADCE0; border-radius: 4px;
+      cursor: pointer; position: relative; background: #fff;
+      transition: background .15s, border-color .15s;
+    }
+    .co-check input[type="checkbox"]:checked { background: var(--orange); border-color: var(--orange); }
+    .co-check input[type="checkbox"]:checked::after {
+      content: ''; position: absolute;
+      top: 1px; left: 5px; width: 6px; height: 10px;
+      border: 2px solid #fff; border-top: none; border-left: none;
+      transform: rotate(45deg);
+    }
+    /* Submit row: Zurück links, Weiter rechts */
+    .co-submit { margin-top: 48px; display: flex; justify-content: space-between; align-items: center; }
+    .co-back { color: var(--orange); font-size: 16px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; background: none; border: none; font-family: inherit; }
+    .co-back:hover { text-decoration: underline; }
+    .btn-co { display: inline-flex; align-items: center; gap: 10px; padding: 16px 40px; background: var(--orange); color: #fff; font-size: 18px; font-weight: 500; line-height: 26px; border-radius: 4px; border: none; cursor: pointer; }
+    .btn-co:hover { background: #d94f00; }
+    .co-box { background: var(--gbg); padding: 24px; }
+    /* "Ihre Bestellung" + "Zusammenfassung" = Überschriften 18px/medium */
+    .co-box-h { font-size: 18px; font-weight: 500; line-height: 26px; color: #405164; margin-bottom: 16px; }
+    .co-thumbs { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .co-thumb { width: 64px; height: 64px; background: #fff; border-radius: 2px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .co-thumb img { width: 70%; height: 70%; object-fit: contain; }
+    .co-more { font-size: 14px; font-weight: 500; color: #405164; }
+    .co-show { color: var(--orange); font-size: 16px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 20px; background: none; border: none; font-family: inherit; }
+    .co-div { border: none; border-top: 1px solid #DADCE0; margin: 12px 0; }
+    /* "Zusammenfassung" = Überschrift 18px/medium */
+    .co-sum-h { font-size: 18px; font-weight: 500; line-height: 26px; color: #405164; margin-bottom: 12px; }
+    .co-row { display: flex; justify-content: space-between; font-size: 16px; line-height: 26px; color: #405164; }
+    /* "Gesamtsumme" ist keine Überschrift: gleiche Größe, nur medium */
+    .co-row.co-total { font-size: 16px; font-weight: 500; line-height: 26px; margin-top: 4px; }
+    .co-mwst { font-size: 14px; line-height: 20px; color: #8C97A2; margin-top: 2px; }
+    /* Step 3: Bestellübersicht */
+    .co3-item { display: flex; gap: 20px; align-items: flex-start; padding: 20px 0; border-bottom: 1px solid var(--g20); }
+    .co3-item:last-child { border-bottom: none; }
+    .co3-thumb { width: 80px; height: 80px; background: var(--gbg); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border-radius: 2px; }
+    .co3-thumb img { width: 70%; height: 70%; object-fit: contain; }
+    .co3-info { flex: 1; }
+    .co3-name { font-size: 16px; font-weight: 500; line-height: 22px; color: #405164; }
+    .co3-unit { font-size: 14px; line-height: 20px; color: #9FA8B2; margin-top: 4px; }
+    .co3-qty  { font-size: 14px; line-height: 20px; color: #9FA8B2; margin-top: 4px; }
+    .co3-price { font-size: 16px; font-weight: 500; color: #405164; white-space: nowrap; }
+    .co3-address-box { background: #fff; border: 1px solid var(--g20); border-radius: 4px; padding: 24px 24px 56px; display: flex; gap: 0; margin-top: 20px; position: relative; }
+    .co3-addr-col { flex: 1; padding-right: 32px; }
+    .co3-icon { color: var(--orange); margin-bottom: 12px; display: block; }
+    .co3-addr-lbl { font-size: 16px; font-weight: 500; color: #405164; margin-bottom: 8px; }
+    .co3-addr-val { font-size: 14px; line-height: 22px; color: #697481; }
+    .co3-edit { position: absolute; bottom: 20px; right: 24px; color: var(--orange); font-size: 16px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; background: none; border: none; font-family: inherit; }
+
+    /* Verbundene Radio-Gruppe (geteilte Borders) */
+    .co-radios-grp { display: flex; gap: 0; margin-bottom: 24px; }
+    .co-radios-grp .co-radio { flex: 1; border-radius: 0; border-right: none; position: relative; }
+    .co-radios-grp .co-radio:first-child { border-radius: 4px 0 0 4px; }
+    .co-radios-grp .co-radio:last-child  { border-radius: 0 4px 4px 0; border-right: 1px solid var(--g20); }
+    .co-radios-grp .co-radio.sel {
+      background: #F5F6F7;
+      z-index: 2;
+    }
+    /* Gutschein-Eingabe */
+    .co-voucher { display: none; flex-direction: row; gap: 12px; align-items: stretch; margin-top: 16px; }
+    .co-voucher.visible { display: flex; }
+    .co-voucher input { flex: 1; border: 1px solid var(--g20); border-radius: 4px; padding: 14px 16px; font-size: 16px; font-family: inherit; color: #405164; outline: none; }
+    .co-voucher input:focus { border-color: var(--orange); }
+    .btn-voucher { padding: 14px 20px; border: 1.5px solid var(--orange); border-radius: 4px; background: #fff; color: var(--orange); font-size: 16px; font-weight: 500; font-family: inherit; cursor: pointer; white-space: nowrap; }
+    .btn-voucher:hover { background: #fff5f0; }
+    /* Abholung Info-Box */
+    .co-pickup-box { border: 1px solid var(--green); border-radius: 0; padding: 24px; background: #FBFCF3; display: flex; flex-direction: row; align-items: flex-start; gap: 16px; margin-bottom: 32px; }
+    .co-pickup-box svg { flex-shrink: 0; margin-top: 2px; }
+    .co-pickup-txt { display: flex; flex-direction: column; gap: 8px; }
+    .co-pickup-box p { font-size: 16px; line-height: 24px; color: var(--dark); margin: 0; }
+    /* Info-Box (Step 2) */
+    .co-info-box {
+      border: 1px solid #B7BF00; border-radius: 4px;
+      padding: 20px 24px; display: flex; gap: 16px; align-items: flex-start;
+      margin-top: 32px; margin-bottom: 0;
+      background: rgba(183,191,0,0.07);
+    }
+    .co-info-icon { flex-shrink: 0; color: #B7BF00; margin-top: 2px; }
+    .co-info-txt  { font-size: 16px; line-height: 24px; color: #405164; }
+    /* PLZ-Eingabe */
+    .co-fld-inp { width: 100%; border: 1px solid var(--g20); border-radius: 4px; padding: 16px; font-size: 16px; line-height: 22px; font-family: inherit; color: #9FA8B2; outline: none; margin-bottom: 24px; }
+    .co-fld-inp:focus { border-color: var(--orange); color: #405164; }
+
+
+    /* ── WARENKORB SIDEBAR ── */
+    .cart-overlay {
+      display: none; position: fixed; inset: 0; z-index: 400;
+      background: rgba(27,40,85,0.45);
+    }
+    .cart-overlay.open { display: block; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
+    .cart-panel {
+      position: fixed; top: 0; right: -480px; width: 440px; height: 100vh;
+      background: #fff; z-index: 401;
+      display: flex; flex-direction: column;
+      box-shadow: -4px 0 24px rgba(0,0,0,0.12);
+      transition: right 0.35s cubic-bezier(.4,0,.2,1);
+    }
+    .cart-panel.open { right: 0; }
+    .cart-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 28px 24px 20px; border-bottom: 1px solid var(--g20);
+      flex-shrink: 0;
+    }
+    .cart-head h2 { font-size: 18px; font-weight: 500; line-height: 26px; color: #405164; }
+    .cart-close {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--navy);
+    }
+    .cart-close:hover { background: var(--gbg); }
+    .cart-confirm {
+      margin: 16px 24px; padding: 16px;
+      background: rgba(183,191,0,0.08); border: 1px solid #B7BF00; border-radius: 4px;
+      display: flex; align-items: flex-start; gap: 12px;
+      font-size: 16px; line-height: 22px; color: #405164; flex-shrink: 0;
+    }
+    .cart-confirm svg { flex-shrink: 0; }
+    .cart-items { flex: 1; overflow-y: auto; padding: 0 24px; }
+    .cart-item {
+      display: flex; gap: 16px; padding: 20px 0;
+      border-bottom: 1px solid var(--g20); position: relative;
+    }
+    .cart-item:last-child { border-bottom: none; }
+    .cart-item-img {
+      width: 80px; height: 80px; flex-shrink: 0;
+      background: var(--gbg); overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .cart-item-img img { width: 70%; height: 70%; object-fit: contain; }
+    .cart-item-body { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+    .cart-item-name { font-size: 16px; font-weight: 500; line-height: 22px; color: #405164; }
+    .cart-item-unit { font-size: 14px; line-height: 20px; color: #9FA8B2; margin-top: 2px; }
+    .cart-item-qty {
+      display: flex; align-items: center; justify-content: space-between; margin-top: 4px;
+    }
+    .cart-qty-ctrl {
+      display: flex; align-items: center;
+      border: 1px solid var(--g20); border-radius: 4px; height: 32px; overflow: hidden;
+    }
+    .cqbtn {
+      width: 32px; height: 32px; background: #fff; border: none;
+      color: var(--orange); font-size: 16px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
+    }
+    .cqbtn:hover { background: var(--gbg); }
+    .cqval {
+      width: 36px; height: 32px; border: none;
+      border-left: 1px solid var(--g20); border-right: 1px solid var(--g20);
+      text-align: center; font-size: 14px; font-family: inherit;
+      color: var(--navy); padding: 0; line-height: 32px;
+      display: block; -moz-appearance: textfield;
+    }
+    .cqval::-webkit-inner-spin-button, .cqval::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    .cart-item-price { font-size: 16px; font-weight: 500; line-height: 22px; color: #405164; white-space: nowrap; align-self: flex-end; }
+    .cart-item-del {
+      position: absolute; top: 20px; right: 0;
+      color: #E53935; cursor: pointer; padding: 4px;
+    }
+    .cart-item-del:hover { color: #B71C1C; }
+    .cart-summary { padding: 24px 24px 20px; border-top: 1px solid var(--g20); flex-shrink: 0; }
+    .cart-sum-row { display: flex; justify-content: space-between; align-items: center; font-size: 16px; line-height: 26px; color: #405164; }
+    .cart-sum-row.total { font-size: 18px; font-weight: 700; line-height: 26px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--g20); }
+    .cart-vat { font-size: 14px; line-height: 20px; color: #8C97A2; margin-top: 4px; }
+    .cart-actions { padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0; }
+    .btn-checkout {
+      width: 100%; padding: 18px; background: var(--orange); color: #fff;
+      font-size: 18px; font-weight: 500; border-radius: 4px; border: none; cursor: pointer; text-align: center;
+    }
+    .btn-checkout:hover { background: #d94f00; }
+    .btn-continue {
+      width: 100%; padding: 16px; background: #fff; color: var(--orange);
+      font-size: 18px; font-weight: 500; border-radius: 4px;
+      border: 2px solid var(--orange); cursor: pointer; text-align: center;
+    }
+    .btn-continue:hover { background: rgba(250,95,7,0.04); }
+    .cart-empty { padding: 48px 24px; text-align: center; color: var(--g60); font-size: 16px; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════
+  WARENKORB SIDEBAR
+══════════════════════════ -->
+<div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+<div class="cart-panel" id="cart-panel">
+  <div class="cart-head">
+    <h2 id="cart-heading">Ihr Warenkorb</h2>
+    <div class="cart-close" onclick="closeCart()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </div>
+  </div>
+  <div class="cart-confirm" id="cart-confirm" style="display:none;">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2E7D32" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>
+    Der Artikel wurde zum Warenkorb hinzugefügt.
+  </div>
+  <div class="cart-items" id="cart-items"></div>
+  <div class="cart-summary" id="cart-summary" style="display:none;">
+    <div class="cart-sum-row"><span>Zwischensumme</span><span id="cart-subtotal">0,00 €</span></div>
+    <div class="cart-sum-row"><span>Versandkosten</span><span>3,90 €</span></div>
+    <div class="cart-sum-row total"><span>Gesamtsumme</span><span id="cart-total">0,00 €</span></div>
+    <div class="cart-vat" id="cart-vat"></div>
+  </div>
+  <div class="cart-actions" id="cart-actions" style="display:none;">
+    <button class="btn-checkout" onclick="goToCheckout()">Zur Kasse</button>
+    <button class="btn-continue" onclick="closeCart(); navigate('plp');">Weiter einkaufen</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+  HOME
+══════════════════════════ -->
+<div id="screen-home" class="screen active">
+
+  <header class="header">
+    <div class="hdr-inner">
+      <div class="logo" onclick="navigate('home')"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTg2IiBoZWlnaHQ9IjI2IiB2aWV3Qm94PSIwIDAgMTg2IDI2IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik03MS4zNDM3IDBDNjMuNjM3IDAgNjIuMDI1IDQuNTU3NzUgNjIuMDI1IDEyLjc5NDdDNjIuMDI1IDIwLjkzMzggNjIuNjIxOCAyNS41NTk5IDY5LjI0NjIgMjUuNTU5OUM3MS40NTI4IDI1LjU1OTkgNzMuNzYyNCAyNS4wMTE1IDc0LjYzOTcgMjIuOTA2Nkg3NC43Mjk2TDc0Ljg0OTUgMjUuMDg4Mkg3OS4yODQxVjExLjcwMzlINzAuODY0M1YxNi4wNjcxSDczLjE3MTVDNzMuMTM3OSAyMC4zNzcxIDcyLjM0ODEgMjEuMjI2MyA3MC45ODQxIDIxLjIyNjJDNjguOTg4NSAyMS4yMjYyIDY4Ljc2NjggMTkuNDQ4IDY4Ljc2NjggMTIuNzk0N0M2OC43NjY4IDYuMTM3OTEgNjguOTY3IDQuMzMzNzEgNzEuMTA0IDQuMzMzNjhDNzEuODc0NyA0LjMzMzY4IDcyLjM2MjUgNC43MDc0OSA3Mi42MDIyIDUuMzk0OTlDNzIuODUwMyA2LjA0ODI5IDcyLjk2MTcgNy4wMTUyNiA3Mi45NjE3IDguMjU0NTlINzkuMjg0MUM3OS4yODQxIDIuMjkzNjEgNzUuOTY4OSAwIDcxLjM0MzcgMFpNMCAwLjQ3MTY5M0w1LjQyMzQ0IDI1LjA4ODJIMTMuODEzM0wxOS4yMDY4IDAuNDcxNjkzSDEyLjI4NTFMOS42NDgzMyAxOS4wMTUxSDkuNTg4NEw2Ljk1MTU5IDAuNDcxNjkzSDBaTTE5Ljc0NjEgMC40NzE2OTNWMjUuMDg4MkgyNi4yNDgyVjE0Ljk0NjhIMzAuMjYzNFYyNS4wODgySDM2Ljc2NTVWMC40NzE2OTNIMzAuMjYzNFY5LjQ5Mjg4SDI2LjI0ODJWMC40NzE2OTNIMTkuNzQ2MVpNMzcuMzA0OSAwLjQ3MTY5M0w0Mi42OTgzIDI1LjA4ODJINTEuMTE4Mkw1Ni41MTE2IDAuNDcxNjkzSDQ5LjU2TDQ2LjkyMzIgMTkuMDE1MUg0Ni44NjMzTDQ0LjIyNjUgMC40NzE2OTNIMzcuMzA0OVpNODEuNDExNSAwLjQ3MTY5M1YyNS4wODgySDg3Ljk0MzZWMTUuMjQxNkg4OS42NTE1QzkxLjIyMjggMTUuMjQxNiA5MS43NzkgMTUuOTUzOSA5MS43NzkgMTguNzQ5OFYyMC40MDA3QzkxLjc3OSAyMS40MzczIDkxLjc3NzggMjMuNzc2OSA5Mi40MDgyIDI1LjA4ODJIOTkuMzU5OFYyNC43MzQ0Qzk4LjkzNzkgMjQuNTMwNSA5OC43ODQ1IDI0LjI3NTggOTguNjEwNyAyMy45OTc1Qzk4LjI5NTUgMjMuNTEzOSA5OC4zMTExIDIxLjg1NDcgOTguMzExMSAyMC41Nzc3VjE4LjQ4NDVDOTguMzExMSAxNS4yMDg2IDk3LjM2MDYgMTMuMjIwNCA5NC4yMDYgMTIuOTQyMVYxMi44ODMxQzk3LjE4MzIgMTIuNDI5MSA5OC40OTA5IDEwLjI5NTkgOTguNDkwOSA3LjAxNjQ5Qzk4LjQ5MDkgMy4yMjYzOCA5Ni41NzMyIDAuNDcxNjkzIDkxLjU5OTIgMC40NzE2OTNIODEuNDExNVpNMTAwLjczOCAwLjQ3MTY5M1YxNi41OTc3QzEwMC43MzggMjMuNDkwMyAxMDMuNzQ5IDI1LjU1OTkgMTA5LjIxOCAyNS41NTk5QzExNC42ODMgMjUuNTU5OSAxMTcuNjY4IDIzLjQ5MDMgMTE3LjY2OCAxNi41OTc3VjAuNDcxNjkzSDExMS4xNjZWMTguMjE5MkMxMTEuMTY2IDIwLjYgMTEwLjQ0IDIxLjIyNjMgMTA5LjIxOCAyMS4yMjYyQzEwNy45OTEgMjEuMjI2MiAxMDcuMjQgMjAuNiAxMDcuMjQgMTguMjE5MlYwLjQ3MTY5M0gxMDAuNzM4Wk0xMTkuNzA1IDAuNDcxNjkzVjI1LjA4ODJIMTI2LjIzN1YxNS43MTMzSDEyOC41MTVDMTMzLjgwNiAxNS43MTMzIDEzNi43MjUgMTMuMDg2IDEzNi43MjUgOC4wNDgyN0MxMzYuNzI1IDMuNzQ1MjUgMTM0LjQ4IDAuNDcxNjkzIDEyOS41MDMgMC40NzE2OTNIMTE5LjcwNVpNMTM4LjAxMyAwLjQ3MTY5M1YyNS4wODgySDE0NC41MTVWMTUuNzEzM0gxNDYuNzkyQzE1Mi4wODQgMTUuNzEzMyAxNTUuMDAyIDEzLjA4NiAxNTUuMDAyIDguMDQ4MjdDMTU1LjAwMiAzLjc0NTI1IDE1Mi43NTkgMC40NzE2OTMgMTQ3Ljc4MSAwLjQ3MTY5M0gxMzguMDEzWk0xNTYuNTMxIDAuNDcxNjkzVjI1LjA4ODJIMTcxLjY5MlYxOS44NDA2SDE2My4wNjNWMTQuOTQ2OEgxNzAuODUzVjkuOTM1MDRIMTYzLjA2M1Y1LjcxOTI4SDE3MS4zNjNWMC40NzE2OTNIMTU2LjUzMVpNODcuOTQzNiA1LjEwMDE5SDg5LjIwMjFDOTEuMTYyOSA1LjEwMDE5IDkxLjk1ODggNS45NjMzNiA5MS45NTg4IDcuOTU5ODhDOTEuOTU4OCA5LjcxNTcxIDkxLjA5MSAxMC44Nzg0IDg5LjIzMjEgMTAuODc4NEg4Ny45NDM2VjUuMTAwMTlaTTEyNi4yMzcgNS4xMDAxOUgxMjcuNDY2QzEyOS4xMTQgNS4xMDAxOSAxMjkuOTgzIDYuMDQ3MTMgMTI5Ljk4MyA4LjA3NzhDMTI5Ljk4MyAxMC4xNDk3IDEyOS4xMTQgMTEuMDg0OCAxMjcuNDY2IDExLjA4NDhIMTI2LjIzN1Y1LjEwMDE5Wk0xNDQuNTE1IDUuMTAwMTlIMTQ1Ljc0NEMxNDcuMzg4IDUuMTAwMTkgMTQ4LjI2MSA2LjA0NzEzIDE0OC4yNjEgOC4wNzc4QzE0OC4yNjEgMTAuMTQ5NyAxNDcuMzg4IDExLjA4NDggMTQ1Ljc0NCAxMS4wODQ4SDE0NC41MTVWNS4xMDAxOVoiIGZpbGw9IiM0MDUxNjQiLz48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTE3NC43MDQgMjUuNTU5OUgxODAuMjgzTDE4NiAwSDE4MC40MjJMMTc0LjcwNCAyNS41NTk5WiIgZmlsbD0iIzk5QTMxOSIvPjwvc3ZnPg==" alt="VHV Gruppe"></div>
+      <div class="hdr-btns">
+        <button class="btn-hdr" onclick="openCart(false)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Warenkorb</button>
+        <button class="btn-hdr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Mein Konto</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <!-- Tiles: right-aligned to viewport edge, outside the centered inner -->
+    <div class="tw">
+      <!-- row 0: col4=amber -->
+      <div class="t" style="left:584px;top:0;background:#f1ab01"></div>
+      <!-- row 1: col3=navy  col4=red -->
+      <div class="t" style="left:438px;top:146px;background:#0e2546"></div>
+      <div class="t" style="left:584px;top:146px;background:#c51101"></div>
+      <!-- row 2: col1=cyan  col2=red  col3=green(Lücke)  col4=cyan -->
+      <div class="t" style="left:146px;top:292px;background:#3db7e4"></div>
+      <div class="t" style="left:292px;top:292px;background:#c51101"></div>
+      <div class="t" style="left:438px;top:292px;background:#b7bf00"></div>
+      <div class="t" style="left:584px;top:292px;background:#3db7e4"></div>
+      <!-- row 3: col0=amber col1=navy col2=green col3=amber col4=green -->
+      <div class="t" style="left:0;top:438px;background:#f1ab01"></div>
+      <div class="t" style="left:146px;top:438px;background:#0e2546"></div>
+      <div class="t" style="left:292px;top:438px;background:#b7bf00"></div>
+      <div class="t" style="left:438px;top:438px;background:#f1ab01"></div>
+      <div class="t" style="left:584px;top:438px;background:#b7bf00"></div>
+      <div class="t" style="left:438px;top:582px;background:#b7bf00"></div>
+    </div>
+    <!-- Centered inner for text content -->
+    <div class="hero-inner">
+      <div class="hero-txt">
+        <h1 class="hero-h1">Merchandise Shop</h1>
+        <p class="hero-sub">Gemeinsam sind wir Experten.<br>Ab sofort können wir es auch zeigen.</p>
+        <button class="btn-hero" onclick="navigate('plp')">Alle Artikel ansehen →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Promo card: normal flow, negative margin pulls it into hero bottom -->
+  <div class="hero-promo">
+    <svg class="promo-icon" viewBox="0 0 40 40" fill="none">
+      <circle cx="20" cy="20" r="8" fill="#F1AB01"/>
+      <line x1="20" y1="3" x2="20" y2="10" stroke="#F1AB01" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="20" y1="30" x2="20" y2="37" stroke="#F1AB01" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="3"  y1="20" x2="10" y2="20" stroke="#F1AB01" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="30" y1="20" x2="37" y2="20" stroke="#F1AB01" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="7.5" y1="7.5"   x2="12.5" y2="12.5" stroke="#F1AB01" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="27.5" y1="27.5" x2="32.5" y2="32.5" stroke="#F1AB01" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="7.5"  y1="32.5" x2="12.5" y2="27.5" stroke="#F1AB01" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="27.5" y1="12.5" x2="32.5" y2="7.5"  stroke="#F1AB01" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+    <div class="promo-ttl">Frisch eingetroffen – unsere aktuelle Urlaubskollektion!</div>
+    <span class="promo-lnk" onclick="navigate('plp')">Jetzt entdecken →</span>
+  </div>
+
+  <!-- Bestseller -->
+  <section class="section" style="padding-bottom:0;">
+   <div class="cnt">
+    <h2 class="sec-title">Unsere Bestseller</h2>
+    <p class="sec-sub">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor.</p>
+    <div class="pgrid">
+      <div class="card" onclick="goToProduct(0)"><div class="cimg"><span class="cbadge cbadge-green">Neu eingetroffen</span><img src="https://www.figma.com/api/mcp/asset/475efc56-a70e-4b7b-b37d-0a3331d1b8a5" alt=""></div><div class="cbody"><div class="cname">To-Go Kaffeebecher</div><div class="cdesc">Porzellan, Spülmaschinen-fest</div><div class="cvar">Ausführung X, Y und Z</div><div class="cprice">14,90 €</div><div class="cavail"><span class="dot dg"></span>sofort lieferbar</div></div></div>
+      <div class="card" onclick="goToProduct(1)"><div class="cimg"><img src="https://www.figma.com/api/mcp/asset/a708a6c5-151f-4e89-94de-fb44b923d6a3" alt=""></div><div class="cbody"><div class="cname">Notizzettel-Klotz</div><div class="cdesc">1.500 Blatt, Leimbindung</div><div class="cvar">Ausführung X, Y und Z</div><div class="cprice">1,90 €</div><div class="cavail"><span class="dot dy"></span>Bestand gering</div></div></div>
+      <div class="card" onclick="goToProduct(2)"><div class="cimg"><span class="cbadge cbadge-red">Wenige verfügbar</span><img src="https://www.figma.com/api/mcp/asset/c142e082-573b-4277-bb36-20d99b10f764" alt=""></div><div class="cbody"><div class="cname">Kugelschreiber "Greenline"</div><div class="cdesc">Blaue Tinte, Premium Qualität</div><div class="cvar">Ausführung X, Y und Z</div><div class="cprice">1,90 €</div><div class="cavail"><span class="dot dg"></span>sofort lieferbar</div></div></div>
+      <div class="card" onclick="goToProduct(3)"><div class="cimg"><span class="cbadge cbadge-amber">Neu</span><img src="https://www.figma.com/api/mcp/asset/868ad47b-4b08-4814-8557-58d3552c6b7d" alt=""></div><div class="cbody"><div class="cname">Kugelschreiber "Greenline"</div><div class="cdesc">280 Seiten, liniert</div><div class="cvar">Ausführung X, Y und Z</div><div class="cprice">5,90 €</div><div class="cavail"><span class="dot dg"></span>sofort lieferbar</div></div></div>
+      <div class="card" onclick="goToProduct(4)"><div class="cimg"><img src="https://www.figma.com/api/mcp/asset/dd8f57f0-e444-432b-84e3-24465614dffe" alt=""></div><div class="cbody"><div class="cname">T-Shirt</div><div class="cdesc">100 % Baumwolle, reguläre Passform</div><div class="cvar">Ausführung X, Y und Z</div><div class="cprice">14,90 €</div><div class="cavail"><span class="dot dy"></span>Bestand gering</div></div></div>
+      <div class="card" onclick="goToProduct(5)"><div class="cimg"><img src="https://www.figma.com/api/mcp/asset/03cce42f-66f4-443a-907b-e0ece7d6fbac" alt=""></div><div class="cbody"><div class="cname">Lanyard "Experten"</div><div class="cdesc">Mit Karabinerhaken</div><div class="cvar">Ausführung X, Y und Z</div><div class="cprice">2,90 €</div><div class="cavail"><span class="dot dg"></span>sofort lieferbar</div></div></div>
+    </div>
+    <div class="mehr-row"><button class="btn-mehr" onclick="navigate('plp')">Mehr anzeigen →</button></div>
+   </div>
+  </section>
+
+  <!-- Give Aways (white bg) -->
+  <section class="section" style="padding-top:150px;">
+   <div class="cnt">
+    <h2 class="sec-title">Give Aways mit Impact</h2>
+    <p class="sec-sub">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor.</p>
+    <div class="pgrid">
+      <div class="card" onclick="goToProduct(0)"><div class="cimg"><span class="cbadge cbadge-green">Neu eingetroffen</span><img src="https://www.figma.com/api/mcp/asset/475efc56-a70e-4b7b-b37d-0a3331d1b8a5" alt=""></div><div class="cbody"><div class="cname">To-Go Kaffeebecher</div><div class="cdesc">Porzellan, Spülmaschinen-fest</div><div class="cvar">Ausführung X, Y und Z</div><div class="cprice">14,90 €</div><div class="cavail"><span class="dot dg"></span>sofort lieferbar</div></div></div>
+      <div class="card" onclick="goToProduct(1)"><div class="cimg"><img src="https://www.figma.com/api/mcp/asset/a708a6c5-151f-4e89-94de-fb44b923d6a3" alt=""></div><div class="cbody"><div class="cname">Notizzettel-Klotz</div><div class="cdesc">1.500 Blatt, Leimbindung</div><div class="cvar">Ausführung X, Y und Z</div><div class="cprice">1,90 €</div><div class="cavail"><span class="dot dy"></span>Bestand gering</div></div></div>
+      <div class="card" onclick="goToProduct(2)"><div class="cimg"><span class="cbadge cbadge-red">Wenige verfügbar</span><img src="https://www.figma.com/api/mcp/asset/c142e082-573b-4277-bb36-20d99b10f764" alt=""></div><div class="cbody"><div class="cname">Kugelschreiber "Greenline"</div><div class="cdesc">Blaue Tinte, Premium Qualität</div><div class="cvar">Ausführung X, Y und Z</div><div class="cprice">1,90 €</div><div class="cavail"><span class="dot dg"></span>sofort lieferbar</div></div></div>
+    </div>
+    <div class="mehr-row"><button class="btn-mehr" onclick="navigate('plp')">Mehr anzeigen →</button></div>
+   </div>
+  </section>
+
+  <!-- Onboarding: centered 1272px, NOT full-bleed -->
+  <section class="section" style="padding-top:0; padding-bottom:0;">
+   <div class="cnt">
+    <div class="onb-box">
+      <div class="onb-img"><img src="https://www.figma.com/api/mcp/asset/e293822c-0eb0-435e-9493-7f35c49c9623" alt="Onboarding"></div>
+      <div class="onb-body">
+        <div class="onb-chip">Als Bundle erhältlich</div>
+        <div class="onb-ttl">So geht Onboarding –<br>unser Starter-Set für neue Mitarbeitende</div>
+        <div class="onb-sub">Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Curabitur blandit tempus.</div>
+        <span class="onb-lnk" onclick="goToProduct(3)">Zum Produkt →</span>
+      </div>
+    </div>
+   </div>
+  </section>
+
+  <!-- FAQ: centered, 392px left + 880px right = 1272px -->
+  <div class="faq-wrap">
+   <div class="faq-cnt">
+    <div class="faq-l">
+      <h2 class="faq-h">Unsere FAQs</h2>
+      <p class="faq-s">Lorem ipsum dolor sit amet, consetetur sadipscing elit.</p>
+      <button class="btn-faq">Alle FAQs ansehen →</button>
+    </div>
+    <div class="faq-r">
+      <div class="faq-item"><span class="faq-q">Nullam quis risus eget urna mollis ornare vel eu leo?</span><span class="faq-btn">+</span></div>
+      <div class="faq-item"><span class="faq-q">Sed possuere consectetur est at lobortis?</span><span class="faq-btn">+</span></div>
+      <div class="faq-item"><span class="faq-q">Cum sociis natoque penatibus et magnis dis parturient?</span><span class="faq-btn">+</span></div>
+      <div class="faq-item"><span class="faq-q">Maecenas faucibus mollis interdum?</span><span class="faq-btn">+</span></div>
+      <div class="faq-item"><span class="faq-q">Nullam quis risus eget urna mollis ornare vel eu leo?</span><span class="faq-btn">+</span></div>
+    </div>
+   </div>
+  </div>
+
+  <div class="footer-wrapper">
+    <footer class="footer">
+      <div class="ft-inner">
+        <div class="ft-l">
+          <p class="ft-q"><em>Sie haben Fragen</em> zu unseren Artikeln oder Ihrer Bestellung?</p>
+          <div class="ft-contact"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Schreiben Sie uns!</div>
+        </div>
+        <div class="ft-c">
+          <div class="ft-socials">
+            <div class="ft-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></div>
+            <div class="ft-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></div>
+          </div>
+          <div class="ft-links">Seitenübersicht / Datenschutz / Impressum / Cookie-Einstellungen</div>
+          <div class="ft-copy">© 2026 VHV Gruppe</div>
+        </div>
+      </div>
+    </footer>
+    <div class="ft-tw">
+      <div class="ft-t" style="left:216px;top:0;background:#fa5f07"></div>
+      <div class="ft-t" style="left:144px;top:72px;background:#b7bf00"></div>
+      <div class="ft-t" style="left:216px;top:72px;background:#3db7e4"></div>
+      <div class="ft-t" style="left:72px;top:144px;background:#c51101"></div>
+      <div class="ft-t" style="left:144px;top:144px;background:#0e2546"></div>
+      <div class="ft-t" style="left:216px;top:216px;background:#f1ab01"></div>
+    </div>
+  </div>
+
+</div><!-- /home -->
+
+
+<!-- ══════════════════════════
+  PLP
+══════════════════════════ -->
+<div id="screen-plp" class="screen">
+  <header class="header">
+    <div class="hdr-inner">
+      <div class="logo" onclick="navigate('home')"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTg2IiBoZWlnaHQ9IjI2IiB2aWV3Qm94PSIwIDAgMTg2IDI2IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik03MS4zNDM3IDBDNjMuNjM3IDAgNjIuMDI1IDQuNTU3NzUgNjIuMDI1IDEyLjc5NDdDNjIuMDI1IDIwLjkzMzggNjIuNjIxOCAyNS41NTk5IDY5LjI0NjIgMjUuNTU5OUM3MS40NTI4IDI1LjU1OTkgNzMuNzYyNCAyNS4wMTE1IDc0LjYzOTcgMjIuOTA2Nkg3NC43Mjk2TDc0Ljg0OTUgMjUuMDg4Mkg3OS4yODQxVjExLjcwMzlINzAuODY0M1YxNi4wNjcxSDczLjE3MTVDNzMuMTM3OSAyMC4zNzcxIDcyLjM0ODEgMjEuMjI2MyA3MC45ODQxIDIxLjIyNjJDNjguOTg4NSAyMS4yMjYyIDY4Ljc2NjggMTkuNDQ4IDY4Ljc2NjggMTIuNzk0N0M2OC43NjY4IDYuMTM3OTEgNjguOTY3IDQuMzMzNzEgNzEuMTA0IDQuMzMzNjhDNzEuODc0NyA0LjMzMzY4IDcyLjM2MjUgNC43MDc0OSA3Mi42MDIyIDUuMzk0OTlDNzIuODUwMyA2LjA0ODI5IDcyLjk2MTcgNy4wMTUyNiA3Mi45NjE3IDguMjU0NTlINzkuMjg0MUM3OS4yODQxIDIuMjkzNjEgNzUuOTY4OSAwIDcxLjM0MzcgMFpNMCAwLjQ3MTY5M0w1LjQyMzQ0IDI1LjA4ODJIMTMuODEzM0wxOS4yMDY4IDAuNDcxNjkzSDEyLjI4NTFMOS42NDgzMyAxOS4wMTUxSDkuNTg4NEw2Ljk1MTU5IDAuNDcxNjkzSDBaTTE5Ljc0NjEgMC40NzE2OTNWMjUuMDg4MkgyNi4yNDgyVjE0Ljk0NjhIMzAuMjYzNFYyNS4wODgySDM2Ljc2NTVWMC40NzE2OTNIMzAuMjYzNFY5LjQ5Mjg4SDI2LjI0ODJWMC40NzE2OTNIMTkuNzQ2MVpNMzcuMzA0OSAwLjQ3MTY5M0w0Mi42OTgzIDI1LjA4ODJINTEuMTE4Mkw1Ni41MTE2IDAuNDcxNjkzSDQ5LjU2TDQ2LjkyMzIgMTkuMDE1MUg0Ni44NjMzTDQ0LjIyNjUgMC40NzE2OTNIMzcuMzA0OVpNODEuNDExNSAwLjQ3MTY5M1YyNS4wODgySDg3Ljk0MzZWMTUuMjQxNkg4OS42NTE1QzkxLjIyMjggMTUuMjQxNiA5MS43NzkgMTUuOTUzOSA5MS43NzkgMTguNzQ5OFYyMC40MDA3QzkxLjc3OSAyMS40MzczIDkxLjc3NzggMjMuNzc2OSA5Mi40MDgyIDI1LjA4ODJIOTkuMzU5OFYyNC43MzQ0Qzk4LjkzNzkgMjQuNTMwNSA5OC43ODQ1IDI0LjI3NTggOTguNjEwNyAyMy45OTc1Qzk4LjI5NTUgMjMuNTEzOSA5OC4zMTExIDIxLjg1NDcgOTguMzExMSAyMC41Nzc3VjE4LjQ4NDVDOTguMzExMSAxNS4yMDg2IDk3LjM2MDYgMTMuMjIwNCA5NC4yMDYgMTIuOTQyMVYxMi44ODMxQzk3LjE4MzIgMTIuNDI5MSA5OC40OTA5IDEwLjI5NTkgOTguNDkwOSA3LjAxNjQ5Qzk4LjQ5MDkgMy4yMjYzOCA5Ni41NzMyIDAuNDcxNjkzIDkxLjU5OTIgMC40NzE2OTNIODEuNDExNVpNMTAwLjczOCAwLjQ3MTY5M1YxNi41OTc3QzEwMC43MzggMjMuNDkwMyAxMDMuNzQ5IDI1LjU1OTkgMTA5LjIxOCAyNS41NTk5QzExNC42ODMgMjUuNTU5OSAxMTcuNjY4IDIzLjQ5MDMgMTE3LjY2OCAxNi41OTc3VjAuNDcxNjkzSDExMS4xNjZWMTguMjE5MkMxMTEuMTY2IDIwLjYgMTEwLjQ0IDIxLjIyNjMgMTA5LjIxOCAyMS4yMjYyQzEwNy45OTEgMjEuMjI2MiAxMDcuMjQgMjAuNiAxMDcuMjQgMTguMjE5MlYwLjQ3MTY5M0gxMDAuNzM4Wk0xMTkuNzA1IDAuNDcxNjkzVjI1LjA4ODJIMTI2LjIzN1YxNS43MTMzSDEyOC41MTVDMTMzLjgwNiAxNS43MTMzIDEzNi43MjUgMTMuMDg2IDEzNi43MjUgOC4wNDgyN0MxMzYuNzI1IDMuNzQ1MjUgMTM0LjQ4IDAuNDcxNjkzIDEyOS41MDMgMC40NzE2OTNIMTE5LjcwNVpNMTM4LjAxMyAwLjQ3MTY5M1YyNS4wODgySDE0NC41MTVWMTUuNzEzM0gxNDYuNzkyQzE1Mi4wODQgMTUuNzEzMyAxNTUuMDAyIDEzLjA4NiAxNTUuMDAyIDguMDQ4MjdDMTU1LjAwMiAzLjc0NTI1IDE1Mi43NTkgMC40NzE2OTMgMTQ3Ljc4MSAwLjQ3MTY5M0gxMzguMDEzWk0xNTYuNTMxIDAuNDcxNjkzVjI1LjA4ODJIMTcxLjY5MlYxOS44NDA2SDE2My4wNjNWMTQuOTQ2OEgxNzAuODUzVjkuOTM1MDRIMTYzLjA2M1Y1LjcxOTI4SDE3MS4zNjNWMC40NzE2OTNIMTU2LjUzMVpNODcuOTQzNiA1LjEwMDE5SDg5LjIwMjFDOTEuMTYyOSA1LjEwMDE5IDkxLjk1ODggNS45NjMzNiA5MS45NTg4IDcuOTU5ODhDOTEuOTU4OCA5LjcxNTcxIDkxLjA5MSAxMC44Nzg0IDg5LjIzMjEgMTAuODc4NEg4Ny45NDM2VjUuMTAwMTlaTTEyNi4yMzcgNS4xMDAxOUgxMjcuNDY2QzEyOS4xMTQgNS4xMDAxOSAxMjkuOTgzIDYuMDQ3MTMgMTI5Ljk4MyA4LjA3NzhDMTI5Ljk4MyAxMC4xNDk3IDEyOS4xMTQgMTEuMDg0OCAxMjcuNDY2IDExLjA4NDhIMTI2LjIzN1Y1LjEwMDE5Wk0xNDQuNTE1IDUuMTAwMTlIMTQ1Ljc0NEMxNDcuMzg4IDUuMTAwMTkgMTQ4LjI2MSA2LjA0NzEzIDE0OC4yNjEgOC4wNzc4QzE0OC4yNjEgMTAuMTQ5NyAxNDcuMzg4IDExLjA4NDggMTQ1Ljc0NCAxMS4wODQ4SDE0NC41MTVWNS4xMDAxOVoiIGZpbGw9IiM0MDUxNjQiLz48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTE3NC43MDQgMjUuNTU5OUgxODAuMjgzTDE4NiAwSDE4MC40MjJMMTc0LjcwNCAyNS41NTk5WiIgZmlsbD0iIzk5QTMxOSIvPjwvc3ZnPg==" alt="VHV Gruppe"></div>
+      <div class="hdr-btns">
+        <button class="btn-hdr" onclick="openCart(false)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Warenkorb</button>
+        <button class="btn-hdr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Mein Konto</button>
+      </div>
+    </div>
+  </header>
+  <div class="plp-head">
+    <div class="plp-hi">
+      <h1 class="sec-title">Unsere Artikel</h1>
+      <p style="font-size:18px;line-height:26px;color:var(--gtxt);margin-bottom:0;">Lorem ipsum dolor sit amet, consetetur sadipscing elitr.</p>
+      <div class="fbar">
+        <button class="ftab active" onclick="setFilter(this)">Alle Artikel</button>
+        <button class="ftab" onclick="setFilter(this)">Büro &amp; Schreibwaren</button>
+        <button class="ftab" onclick="setFilter(this)">Sportartikel</button>
+        <button class="ftab" onclick="setFilter(this)">Essen &amp; Trinken</button>
+        <button class="ftab" onclick="setFilter(this)">Taschen &amp; Rucksäcke</button>
+        <button class="ftab" onclick="setFilter(this)">Saisonartikel</button>
+        <button class="ftab" onclick="setFilter(this)">Bundles</button>
+        <button class="ftab" onclick="setFilter(this)">Gutscheine</button>
+      </div>
+    </div>
+  </div>
+  <section class="section" style="padding-top:0;">
+   <div class="cnt">
+<div style="font-size:22px;font-weight:500;color:var(--dark);margin-bottom:32px;">Unser Sortiment (241 Artikel)</div>
+<div class="pgrid" id="plp-grid">
+      <div class="card" onclick="goToProduct(0)"><div class="cimg"><span class="cbadge cbadge-green">Neu eingetroffen</span><img src="https://www.figma.com/api/mcp/asset/475efc56-a70e-4b7b-b37d-0a3331d1b8a5" alt=""></div><div class="cbody"><div class="cname">To-Go Kaffeebecher</div><div class="cdesc">Porzellan, Spülmaschinen-fest</div><div class="cvar">Ausführung X, Y und Z</div><div class="cprice">14,90 €</div><div class="cavail"><span class="dot dg"></span>sofort lieferbar</div></div></div>
+      <div class="card" onclick="goToProduct(1)"><div class="cimg"><img src="https://www.figma.com/api/mcp/asset/a708a6c5-151f-4e89-94de-fb44b923d6a3" alt=""></div><div class="cbody"><div class="cname">Notizzettel-Klotz</div><div class="cdesc">1.500 Blatt, Leimbindung</div><div class="cvar">Ausführung X, Y und Z</div><div class="cprice">1,90 €</div><div class="cavail"><span class="dot dy"></span>Bestand gering</div></div></div>
+      <div class="card" onclick="goToProduct(2)"><div class="cimg"><span class="cbadge cbadge-red">Wenige verfügbar</span><img src="https://www.figma.com/api/mcp/asset/c142e082-573b-4277-bb36-20d99b10f764" alt=""></div><div class="cbody"><div class="cname">Kugelschreiber "Greenline"</div><div class="cdesc">Blaue Tinte, Premium Qualität</div><div class="cvar">Ausführung X, Y und Z</div><div class="cprice">1,90 €</div><div class="cavail"><span class="dot dg"></span>sofort lieferbar</div></div></div>
+      <div class="card" onclick="goToProduct(3)"><div class="cimg"><span class="cbadge cbadge-amber">Neu</span><img src="https://www.figma.com/api/mcp/asset/868ad47b-4b08-4814-8557-58d3552c6b7d" alt=""></div><div class="cbody"><div class="cname">Kugelschreiber "Greenline"</div><div class="cdesc">280 Seiten, liniert</div><div class="cvar">Ausführung X, Y und Z</div><div class="cprice">5,90 €</div><div class="cavail"><span class="dot dg"></span>sofort lieferbar</div></div></div>
+      <div class="card" onclick="goToProduct(4)"><div class="cimg"><img src="https://www.figma.com/api/mcp/asset/dd8f57f0-e444-432b-84e3-24465614dffe" alt=""></div><div class="cbody"><div class="cname">T-Shirt</div><div class="cdesc">100 % Baumwolle, reguläre Passform</div><div class="cvar">Ausführung X, Y und Z</div><div class="cprice">14,90 €</div><div class="cavail"><span class="dot dy"></span>Bestand gering</div></div></div>
+      <div class="card" onclick="goToProduct(5)"><div class="cimg"><img src="https://www.figma.com/api/mcp/asset/03cce42f-66f4-443a-907b-e0ece7d6fbac" alt=""></div><div class="cbody"><div class="cname">Lanyard "Experten"</div><div class="cdesc">Mit Karabinerhaken</div><div class="cvar">Ausführung X, Y und Z</div><div class="cprice">2,90 €</div><div class="cavail"><span class="dot dg"></span>sofort lieferbar</div></div></div>
+    </div>
+    <!-- Onboarding inside PLP, same 1272px width -->
+    <div class="onb-box" style="margin-top:92px;margin-bottom:92px;">
+      <div class="onb-chip">Als Bundle erhältlich</div>
+      <div class="onb-img"><img src="https://www.figma.com/api/mcp/asset/1bd238ec-50f3-4f43-98fb-23301f585cf2" alt=""></div>
+      <div class="onb-body"><div class="onb-ttl">So geht Onboarding –<br>unser Starter-Set für neue Mitarbeitende</div><div class="onb-sub">Praesent commodo cursus magna, vel scelerisque nisl consectetur et.</div><span class="onb-lnk" onclick="goToProduct(4)">Zum Produkt →</span></div>
+    </div>
+    <div class="pgrid" id="plp-grid-2" style="margin-top:64px;">
+      <div class="card" onclick="goToProduct(0)"><div class="cimg"><span class="cbadge cbadge-green">Neu eingetroffen</span><img src="https://www.figma.com/api/mcp/asset/475efc56-a70e-4b7b-b37d-0a3331d1b8a5" alt=""></div><div class="cbody"><div class="cname">To-Go Kaffeebecher</div><div class="cdesc">Porzellan, Spülmaschinen-fest</div><div class="cvar">Ausführung X, Y und Z</div><div class="cprice">14,90 €</div><div class="cavail"><span class="dot dg"></span>sofort lieferbar</div></div></div>
+      <div class="card" onclick="goToProduct(1)"><div class="cimg"><img src="https://www.figma.com/api/mcp/asset/a708a6c5-151f-4e89-94de-fb44b923d6a3" alt=""></div><div class="cbody"><div class="cname">Notizzettel-Klotz</div><div class="cdesc">1.500 Blatt, Leimbindung</div><div class="cvar">Ausführung X, Y und Z</div><div class="cprice">1,90 €</div><div class="cavail"><span class="dot dy"></span>Bestand gering</div></div></div>
+      <div class="card" onclick="goToProduct(2)"><div class="cimg"><span class="cbadge cbadge-red">Wenige verfügbar</span><img src="https://www.figma.com/api/mcp/asset/c142e082-573b-4277-bb36-20d99b10f764" alt=""></div><div class="cbody"><div class="cname">Kugelschreiber "Greenline"</div><div class="cdesc">Blaue Tinte, Premium Qualität</div><div class="cvar">Ausführung X, Y und Z</div><div class="cprice">1,90 €</div><div class="cavail"><span class="dot dg"></span>sofort lieferbar</div></div></div>
+    </div>
+    <div class="ml-row" id="load-more-row">
+      <div class="ml-line"></div>
+      <button class="ml-btn" onclick="loadMore()">
+        Mehr laden
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <div class="ml-line"></div>
+    </div>
+   </div>
+  </section>
+  <div class="footer-wrapper">
+    <footer class="footer">
+      <div class="ft-inner">
+        <div class="ft-l">
+          <p class="ft-q"><em>Sie haben Fragen</em> zu unseren Artikeln oder Ihrer Bestellung?</p>
+          <div class="ft-contact"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Schreiben Sie uns!</div>
+        </div>
+        <div class="ft-c">
+          <div class="ft-socials">
+            <div class="ft-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></div>
+            <div class="ft-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></div>
+          </div>
+          <div class="ft-links">Seitenübersicht / Datenschutz / Impressum / Cookie-Einstellungen</div>
+          <div class="ft-copy">© 2026 VHV Gruppe</div>
+        </div>
+      </div>
+    </footer>
+    <div class="ft-tw">
+      <div class="ft-t" style="left:216px;top:0;background:#fa5f07"></div>
+      <div class="ft-t" style="left:144px;top:72px;background:#b7bf00"></div>
+      <div class="ft-t" style="left:216px;top:72px;background:#3db7e4"></div>
+      <div class="ft-t" style="left:72px;top:144px;background:#c51101"></div>
+      <div class="ft-t" style="left:144px;top:144px;background:#0e2546"></div>
+      <div class="ft-t" style="left:216px;top:216px;background:#f1ab01"></div>
+    </div>
+  </div>
+</div><!-- /plp -->
+
+
+<!-- ══════════════════════════
+  PDP
+══════════════════════════ -->
+<div id="screen-pdp" class="screen">
+  <header class="header">
+    <div class="hdr-inner">
+      <div class="logo" onclick="navigate('home')"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTg2IiBoZWlnaHQ9IjI2IiB2aWV3Qm94PSIwIDAgMTg2IDI2IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik03MS4zNDM3IDBDNjMuNjM3IDAgNjIuMDI1IDQuNTU3NzUgNjIuMDI1IDEyLjc5NDdDNjIuMDI1IDIwLjkzMzggNjIuNjIxOCAyNS41NTk5IDY5LjI0NjIgMjUuNTU5OUM3MS40NTI4IDI1LjU1OTkgNzMuNzYyNCAyNS4wMTE1IDc0LjYzOTcgMjIuOTA2Nkg3NC43Mjk2TDc0Ljg0OTUgMjUuMDg4Mkg3OS4yODQxVjExLjcwMzlINzAuODY0M1YxNi4wNjcxSDczLjE3MTVDNzMuMTM3OSAyMC4zNzcxIDcyLjM0ODEgMjEuMjI2MyA3MC45ODQxIDIxLjIyNjJDNjguOTg4NSAyMS4yMjYyIDY4Ljc2NjggMTkuNDQ4IDY4Ljc2NjggMTIuNzk0N0M2OC43NjY4IDYuMTM3OTEgNjguOTY3IDQuMzMzNzEgNzEuMTA0IDQuMzMzNjhDNzEuODc0NyA0LjMzMzY4IDcyLjM2MjUgNC43MDc0OSA3Mi42MDIyIDUuMzk0OTlDNzIuODUwMyA2LjA0ODI5IDcyLjk2MTcgNy4wMTUyNiA3Mi45NjE3IDguMjU0NTlINzkuMjg0MUM3OS4yODQxIDIuMjkzNjEgNzUuOTY4OSAwIDcxLjM0MzcgMFpNMCAwLjQ3MTY5M0w1LjQyMzQ0IDI1LjA4ODJIMTMuODEzM0wxOS4yMDY4IDAuNDcxNjkzSDEyLjI4NTFMOS42NDgzMyAxOS4wMTUxSDkuNTg4NEw2Ljk1MTU5IDAuNDcxNjkzSDBaTTE5Ljc0NjEgMC40NzE2OTNWMjUuMDg4MkgyNi4yNDgyVjE0Ljk0NjhIMzAuMjYzNFYyNS4wODgySDM2Ljc2NTVWMC40NzE2OTNIMzAuMjYzNFY5LjQ5Mjg4SDI2LjI0ODJWMC40NzE2OTNIMTkuNzQ2MVpNMzcuMzA0OSAwLjQ3MTY5M0w0Mi42OTgzIDI1LjA4ODJINTEuMTE4Mkw1Ni41MTE2IDAuNDcxNjkzSDQ5LjU2TDQ2LjkyMzIgMTkuMDE1MUg0Ni44NjMzTDQ0LjIyNjUgMC40NzE2OTNIMzcuMzA0OVpNODEuNDExNSAwLjQ3MTY5M1YyNS4wODgySDg3Ljk0MzZWMTUuMjQxNkg4OS42NTE1QzkxLjIyMjggMTUuMjQxNiA5MS43NzkgMTUuOTUzOSA5MS43NzkgMTguNzQ5OFYyMC40MDA3QzkxLjc3OSAyMS40MzczIDkxLjc3NzggMjMuNzc2OSA5Mi40MDgyIDI1LjA4ODJIOTkuMzU5OFYyNC43MzQ0Qzk4LjkzNzkgMjQuNTMwNSA5OC43ODQ1IDI0LjI3NTggOTguNjEwNyAyMy45OTc1Qzk4LjI5NTUgMjMuNTEzOSA5OC4zMTExIDIxLjg1NDcgOTguMzExMSAyMC41Nzc3VjE4LjQ4NDVDOTguMzExMSAxNS4yMDg2IDk3LjM2MDYgMTMuMjIwNCA5NC4yMDYgMTIuOTQyMVYxMi44ODMxQzk3LjE4MzIgMTIuNDI5MSA5OC40OTA5IDEwLjI5NTkgOTguNDkwOSA3LjAxNjQ5Qzk4LjQ5MDkgMy4yMjYzOCA5Ni41NzMyIDAuNDcxNjkzIDkxLjU5OTIgMC40NzE2OTNIODEuNDExNVpNMTAwLjczOCAwLjQ3MTY5M1YxNi41OTc3QzEwMC43MzggMjMuNDkwMyAxMDMuNzQ5IDI1LjU1OTkgMTA5LjIxOCAyNS41NTk5QzExNC42ODMgMjUuNTU5OSAxMTcuNjY4IDIzLjQ5MDMgMTE3LjY2OCAxNi41OTc3VjAuNDcxNjkzSDExMS4xNjZWMTguMjE5MkMxMTEuMTY2IDIwLjYgMTEwLjQ0IDIxLjIyNjMgMTA5LjIxOCAyMS4yMjYyQzEwNy45OTEgMjEuMjI2MiAxMDcuMjQgMjAuNiAxMDcuMjQgMTguMjE5MlYwLjQ3MTY5M0gxMDAuNzM4Wk0xMTkuNzA1IDAuNDcxNjkzVjI1LjA4ODJIMTI2LjIzN1YxNS43MTMzSDEyOC41MTVDMTMzLjgwNiAxNS43MTMzIDEzNi43MjUgMTMuMDg2IDEzNi43MjUgOC4wNDgyN0MxMzYuNzI1IDMuNzQ1MjUgMTM0LjQ4IDAuNDcxNjkzIDEyOS41MDMgMC40NzE2OTNIMTE5LjcwNVpNMTM4LjAxMyAwLjQ3MTY5M1YyNS4wODgySDE0NC41MTVWMTUuNzEzM0gxNDYuNzkyQzE1Mi4wODQgMTUuNzEzMyAxNTUuMDAyIDEzLjA4NiAxNTUuMDAyIDguMDQ4MjdDMTU1LjAwMiAzLjc0NTI1IDE1Mi43NTkgMC40NzE2OTMgMTQ3Ljc4MSAwLjQ3MTY5M0gxMzguMDEzWk0xNTYuNTMxIDAuNDcxNjkzVjI1LjA4ODJIMTcxLjY5MlYxOS44NDA2SDE2My4wNjNWMTQuOTQ2OEgxNzAuODUzVjkuOTM1MDRIMTYzLjA2M1Y1LjcxOTI4SDE3MS4zNjNWMC40NzE2OTNIMTU2LjUzMVpNODcuOTQzNiA1LjEwMDE5SDg5LjIwMjFDOTEuMTYyOSA1LjEwMDE5IDkxLjk1ODggNS45NjMzNiA5MS45NTg4IDcuOTU5ODhDOTEuOTU4OCA5LjcxNTcxIDkxLjA5MSAxMC44Nzg0IDg5LjIzMjEgMTAuODc4NEg4Ny45NDM2VjUuMTAwMTlaTTEyNi4yMzcgNS4xMDAxOUgxMjcuNDY2QzEyOS4xMTQgNS4xMDAxOSAxMjkuOTgzIDYuMDQ3MTMgMTI5Ljk4MyA4LjA3NzhDMTI5Ljk4MyAxMC4xNDk3IDEyOS4xMTQgMTEuMDg0OCAxMjcuNDY2IDExLjA4NDhIMTI2LjIzN1Y1LjEwMDE5Wk0xNDQuNTE1IDUuMTAwMTlIMTQ1Ljc0NEMxNDcuMzg4IDUuMTAwMTkgMTQ4LjI2MSA2LjA0NzEzIDE0OC4yNjEgOC4wNzc4QzE0OC4yNjEgMTAuMTQ5NyAxNDcuMzg4IDExLjA4NDggMTQ1Ljc0NCAxMS4wODQ4SDE0NC41MTVWNS4xMDAxOVoiIGZpbGw9IiM0MDUxNjQiLz48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTE3NC43MDQgMjUuNTU5OUgxODAuMjgzTDE4NiAwSDE4MC40MjJMMTc0LjcwNCAyNS41NTk5WiIgZmlsbD0iIzk5QTMxOSIvPjwvc3ZnPg==" alt="VHV Gruppe"></div>
+      <div class="hdr-btns">
+        <button class="btn-hdr" onclick="openCart(false)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Warenkorb</button>
+        <button class="btn-hdr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Mein Konto</button>
+      </div>
+    </div>
+  </header>
+  <div class="pdp-page">
+    <div class="pdp-w">
+      <div class="back" onclick="navigate('plp')"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>Zur Übersicht</div>
+      <div class="pdp-prod">
+        <div>
+          <div class="pdp-mi">
+            <span class="pdp-badge" id="pdp-badge">Neu eingetroffen</span>
+            <img id="pdp-img" src="https://www.figma.com/api/mcp/asset/475efc56-a70e-4b7b-b37d-0a3331d1b8a5" alt="">
+          </div>
+          <div class="pdp-thumbs" id="pdp-thumbs">
+            <div class="pdp-th active"><img src="https://www.figma.com/api/mcp/asset/475efc56-a70e-4b7b-b37d-0a3331d1b8a5" alt=""></div>
+            <div class="pdp-th"><img src="https://www.figma.com/api/mcp/asset/475efc56-a70e-4b7b-b37d-0a3331d1b8a5" alt=""></div>
+            <div class="pdp-th"><img src="https://www.figma.com/api/mcp/asset/475efc56-a70e-4b7b-b37d-0a3331d1b8a5" alt=""></div>
+          </div>
+        </div>
+        <div class="pdp-det">
+          <div class="pdp-meta">
+            <div class="pdp-artnr" id="pdp-artnr">Art.-Nr. 123-4567-89</div>
+            <div class="pdp-av" id="pdp-avail"><span class="dot dg"></span>sofort lieferbar</div>
+          </div>
+          <h1 class="pdp-ttl" id="pdp-title">To-Go Kaffeebecher</h1>
+          <div class="pdp-var" id="pdp-var">Verpackungseinheit: 1 Stück</div>
+          <hr class="pdp-div">
+          <div class="pdp-price-row">
+            <span class="pdp-pr" id="total-price">44,70 €</span>
+            <span class="pdp-pu" id="pdp-unit-price">14,90 € pro Stück</span>
+          </div>
+          <div class="pdp-ship">Abholung möglich – Versand zzgl. 3,90 €</div>
+          <div class="pdp-size-wrap" id="pdp-size-wrap">
+            <select class="pdp-size" id="pdp-size" onchange="this.classList.add('selected')">
+              <option value="" disabled selected>Wählen Sie eine Größe</option>
+            </select>
+            <div class="pdp-size-chevron">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+          <div class="pdp-qr">
+            <div class="pdp-qty">
+              <button class="qbtn" onclick="changeQty(-1)">−</button>
+              <input class="qinp" id="qty" type="number" value="3" min="1">
+              <button class="qbtn" onclick="changeQty(1)">+</button>
+            </div>
+            <button class="btn-cart" id="pdp-add-to-cart" onclick="addToCartFromPDP()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>In den Warenkorb</button>
+          </div>
+          <div class="pdp-info">
+            <div class="pdp-it">Produktinformationen</div>
+            <div class="pdp-tx">Die Coffee To Go Becher werden aus nachwachsenden Rohstoffen umweltfreundlich und fair im Schwarzwald produziert. Sie sind lebensmittelecht, frei von Kunstharzen wie Melamin und schädlichen Weichmachern. Den leichten und bruchfesten To Go-Mehrwegbecher gibt es in vielen verschiedenen Varianten.<span id="mehr-link" class="mehr-lnk" onclick="toggleInfo()"> Mehr ...</span></div>
+            <div class="info-x" id="info-extra">
+              <p style="font-size:18px;line-height:26px;margin-top:16px;">Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Nullam quis risus eget urna mollis ornare vel eu leo. Vestibulum id ligula porta felis euismod semper.</p>
+              <p style="font-size:18px;line-height:26px;margin-top:16px;">Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec ullamcorper nulla non metus auctor fringilla.</p>
+            </div>
+            <button class="btn-dl"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Größentabelle (PDF)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pdp-rel">
+      <h2>Ähnliche Artikel</h2>
+      <div class="rel-grid">
+        <div class="rcrd" onclick="goToProduct(2)"><div class="rimg"><span class="cbadge">Neu</span><img src="https://www.figma.com/api/mcp/asset/868ad47b-4b08-4814-8557-58d3552c6b7d" alt=""></div><div class="cbody"><div class="cname">Kugelschreiber "Greenline"</div><div class="cdesc">280 Seiten, liniert</div><div class="cvar">Ausführung X, Y und Z</div><div class="cprice">5,90 €</div><div class="cavail"><span class="dot dg"></span>lieferbar</div></div></div>
+        <div class="rcrd" onclick="goToProduct(4)"><div class="rimg"><img src="https://www.figma.com/api/mcp/asset/dd8f57f0-e444-432b-84e3-24465614dffe" alt=""></div><div class="cbody"><div class="cname">T-Shirt</div><div class="cdesc">100 % Baumwolle, reguläre Passform</div><div class="cvar">Ausführung X, Y und Z</div><div class="cprice">14,90 €</div><div class="cavail"><span class="dot dy"></span>Bestand gering</div></div></div>
+        <div class="rcrd" onclick="goToProduct(4)"><div class="rimg"><img src="https://www.figma.com/api/mcp/asset/03cce42f-66f4-443a-907b-e0ece7d6fbac" alt=""></div><div class="cbody"><div class="cname">Lanyard "Experten"</div><div class="cdesc">Mit Karabinerhaken</div><div class="cvar">Ausführung X, Y und Z</div><div class="cprice">2,90 €</div><div class="cavail"><span class="dot dg"></span>lieferbar</div></div></div>
+      </div>
+    </div>
+    <div class="footer-wrapper">
+      <footer class="footer">
+        <div class="ft-inner">
+          <div class="ft-l">
+            <p class="ft-q"><em>Sie haben Fragen</em> zu unseren Artikeln oder Ihrer Bestellung?</p>
+            <div class="ft-contact"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Schreiben Sie uns!</div>
+          </div>
+          <div class="ft-c">
+            <div class="ft-socials">
+              <div class="ft-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></div>
+              <div class="ft-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></div>
+            </div>
+            <div class="ft-links">Seitenübersicht / Datenschutz / Impressum / Cookie-Einstellungen</div>
+            <div class="ft-copy">© 2026 VHV Gruppe</div>
+          </div>
+        </div>
+      </footer>
+      <div class="ft-tw">
+        <div class="ft-t" style="left:216px;top:0;background:#fa5f07"></div>
+        <div class="ft-t" style="left:144px;top:72px;background:#b7bf00"></div>
+        <div class="ft-t" style="left:216px;top:72px;background:#3db7e4"></div>
+        <div class="ft-t" style="left:72px;top:144px;background:#c51101"></div>
+        <div class="ft-t" style="left:144px;top:144px;background:#0e2546"></div>
+        <div class="ft-t" style="left:216px;top:216px;background:#f1ab01"></div>
+      </div>
+    </div>
+  </div>
+</div><!-- /pdp -->
+
+<script>
+  /* ── Produktdaten ── */
+  const PRODUCTS = [
+    { id:0, name:'To-Go Kaffeebecher',       desc:'Porzellan, Spülmaschinen-fest',  variant:'Ausführung X, Y und Z', price:14.90, artnr:'123-4567-89', avail:'dg', availTxt:'sofort lieferbar', badge:'Neu eingetroffen', badgeColor:'green', img:'https://www.figma.com/api/mcp/asset/475efc56-a70e-4b7b-b37d-0a3331d1b8a5', category:'essen' },
+    { id:1, name:'Notizzettel-Klotz',         desc:'1.500 Blatt, Leimbindung',       variant:'Ausführung X, Y und Z', price:1.90,  artnr:'123-4567-90', avail:'dy', availTxt:'Bestand gering',   badge:null,               badgeColor:null,    img:'https://www.figma.com/api/mcp/asset/a708a6c5-151f-4e89-94de-fb44b923d6a3', category:'buero' },
+    { id:2, name:'Kugelschreiber "Greenline"',desc:'Blaue Tinte, Premium Qualität',  variant:'Ausführung X, Y und Z', price:1.90,  artnr:'123-4567-91', avail:'dg', availTxt:'sofort lieferbar', badge:'Wenige verfügbar', badgeColor:'red',   img:'https://www.figma.com/api/mcp/asset/c142e082-573b-4277-bb36-20d99b10f764', category:'buero' },
+    { id:3, name:'Kugelschreiber "Greenline"',desc:'280 Seiten, liniert',             variant:'Ausführung X, Y und Z', price:5.90,  artnr:'123-4567-92', avail:'dg', availTxt:'sofort lieferbar', badge:'Neu',              badgeColor:'amber', img:'https://www.figma.com/api/mcp/asset/868ad47b-4b08-4814-8557-58d3552c6b7d', category:'buero' },
+    { id:4, name:'T-Shirt',                    desc:'100 % Baumwolle, reguläre Passform', variant:'Ausführung X, Y und Z', price:14.90, artnr:'123-4567-93', avail:'dg', availTxt:'sofort lieferbar', badge:'Neu eingetroffen', badgeColor:'tc', img:'https://www.figma.com/api/mcp/asset/dd8f57f0-e444-432b-84e3-24465614dffe', category:'sport', sizes:['XS','S','M','L','XL','XXL'] },
+    { id:5, name:'Lanyard "Experten"',        desc:'Mit Karabinerhaken',              variant:'Ausführung X, Y und Z', price:2.90,  artnr:'123-4567-94', avail:'dg', availTxt:'sofort lieferbar', badge:null,               badgeColor:null,    img:'https://www.figma.com/api/mcp/asset/03cce42f-66f4-443a-907b-e0ece7d6fbac', category:'saison' },
+  ];
+
+  function goToProduct(pid) {
+    _currentPDP = pid;
+    const p = PRODUCTS[pid] || PRODUCTS[0];
+    // Bild
+    document.getElementById('pdp-img').src = p.img;
+    document.querySelectorAll('#pdp-thumbs img').forEach(i => i.src = p.img);
+    // Badge
+    const badge = document.getElementById('pdp-badge');
+    if (p.badge) {
+      badge.textContent = p.badge; badge.style.display = '';
+      const colors = { green: 'var(--green)', red: 'var(--tr)', amber: 'var(--ta)', tc: 'var(--tc)' };
+      badge.style.background = colors[p.badgeColor] || '#fff';
+      badge.style.color = p.badgeColor ? '#fff' : 'var(--navy)';
+    } else { badge.style.display = 'none'; }
+    // Größenauswahl
+    const sizeWrap = document.getElementById('pdp-size-wrap');
+    const sizeSelect = document.getElementById('pdp-size');
+    if (p.sizes && p.sizes.length) {
+      sizeWrap.classList.add('visible');
+      sizeSelect.innerHTML = '<option value="" disabled selected>Wählen Sie eine Größe</option>';
+      p.sizes.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; sizeSelect.appendChild(o); });
+      sizeSelect.value = '';
+      sizeSelect.classList.remove('selected');
+    } else {
+      sizeWrap.classList.remove('visible');
+    }
+    // Infos
+    document.getElementById('pdp-artnr').textContent = 'Art.-Nr. ' + p.artnr;
+    document.getElementById('pdp-title').textContent = p.name;
+    // Verfügbarkeit
+    document.getElementById('pdp-avail').innerHTML = '<span class="dot ' + p.avail + '"></span>' + p.availTxt;
+    // Preis
+    const qty = parseInt(document.getElementById('qty').value) || 1;
+    document.getElementById('qty').value = 1;
+    document.getElementById('total-price').textContent = p.price.toFixed(2).replace('.',',') + ' €';
+    document.getElementById('pdp-unit-price').textContent = p.price.toFixed(2).replace('.',',') + ' € pro Stück';
+    // Unit-Preis für Mengenkalkulation setzen
+    window._currentUnitPrice = p.price;
+    // Mehr… zurücksetzen
+    document.getElementById('info-extra').classList.remove('open');
+    document.getElementById('mehr-link').style.removeProperty('display');
+    navigate('pdp');
+  }
+
+
+  /* ── Animiertes Sortieren der Produktliste ── */
+  function sortProducts(criteria) {
+    const grid = document.getElementById('plp-grid');
+    const cards = Array.from(grid.querySelectorAll('.card'));
+
+    // Staggered fade-out
+    cards.forEach((c, i) => {
+      c.style.transition = `opacity 0.12s ${i*25}ms, transform 0.12s ${i*25}ms`;
+      c.style.opacity = '0';
+      c.style.transform = 'scale(0.95) translateY(8px)';
+    });
+
+    const delay = cards.length * 25 + 150;
+    setTimeout(() => {
+      // Sort PRODUCTS array copy
+      let sorted = [...PRODUCTS];
+      if      (criteria === 'price-asc')  sorted.sort((a,b) => a.price - b.price);
+      else if (criteria === 'price-desc') sorted.sort((a,b) => b.price - a.price);
+      else if (criteria === 'name')       sorted.sort((a,b) => a.name.localeCompare(b.name,'de'));
+      else if (criteria === 'new')        sorted.sort((a,b) => (b.badge?1:0)-(a.badge?1:0));
+      // 'recommended' → original id order
+      else                                sorted.sort((a,b) => a.id - b.id);
+
+      // Rebuild grid
+      grid.innerHTML = '';
+      sorted.forEach(p => grid.appendChild(makeCard(p)));
+
+      // Staggered fade-in
+      Array.from(grid.querySelectorAll('.card')).forEach((c, i) => {
+        c.style.transition = 'none';
+        c.style.opacity = '0';
+        c.style.transform = 'scale(0.95) translateY(8px)';
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            c.style.transition = `opacity 0.22s ${i*55}ms, transform 0.22s ${i*55}ms`;
+            c.style.opacity = '1';
+            c.style.transform = 'scale(1) translateY(0)';
+          }, 20);
+        });
+      });
+    }, delay);
+  }
+
+  /* ── Mehr laden: fügt zwei Produktreihen pro Klick hinzu ── */
+  const EXTRA_ROWS = [
+    [0, 1, 2], [3, 4, 5],
+    [2, 4, 1], [5, 0, 3],
+    [1, 3, 5], [0, 2, 4],
+    [4, 1, 0], [3, 5, 2],
+    [5, 2, 3], [1, 4, 0],
+  ];
+  let loadCount = 0;
+  const ROWS_PER_CLICK = 2;
+
+  function makeCard(p) {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.onclick = () => goToProduct(p.id);
+    const badgeCls = p.badgeColor ? ` cbadge-${p.badgeColor}` : '';
+    const badge = p.badge ? `<span class="cbadge${badgeCls}">${p.badge}</span>` : '';
+    const availIcon = p.avail === 'dy'
+      ? '<span class="dot dy"></span>'
+      : '<span class="dot dg"></span>';
+    card.innerHTML = `
+      <div class="cimg">${badge}<img src="${p.img}" alt=""></div>
+      <div class="cbody">
+        <div class="cname">${p.name}</div>
+        <div class="cdesc">${p.desc}</div>
+        <div class="cvar">${p.variant}</div>
+        <div class="cprice">${p.price.toFixed(2).replace('.',',')} €</div>
+        <div class="cavail">${availIcon}${p.availTxt}</div>
+      </div>`;
+    return card;
+  }
+
+  /* ═══════════════════════════════════
+     WARENKORB
+  ═══════════════════════════════════ */
+  let cart = []; // [{id, qty}]
+  const SHIPPING = 3.90;
+
+  let _currentPDP = 0; // which product is shown on PDP
+
+  function addToCartFromPDP() {
+    const qty = Math.max(1, parseInt(document.getElementById('qty').value) || 1);
+    const existing = cart.find(i => i.id === _currentPDP);
+    if (existing) existing.qty += qty;
+    else cart.push({ id: _currentPDP, qty });
+    openCart(true);
+  }
+
+  function addToCart(pid) {
+    const existing = cart.find(i => i.id === pid);
+    if (existing) existing.qty++;
+    else cart.push({ id: pid, qty: 1 });
+    openCart(true);
+  }
+
+  function openCart(showConfirmation) {
+    renderCart();
+    /* Notification: nur beim tatsächlichen Hinzufügen zeigen, dann dauerhaft sichtbar lassen */
+    document.getElementById('cart-confirm').style.display =
+      showConfirmation && cart.length > 0 ? 'flex' : 'none';
+    document.getElementById('cart-overlay').classList.add('open');
+    document.getElementById('cart-panel').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeCart() {
+    document.getElementById('cart-overlay').classList.remove('open');
+    document.getElementById('cart-panel').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function removeFromCart(pid) {
+    cart = cart.filter(i => i.id !== pid);
+    renderCart();
+  }
+
+  function changeCartQty(pid, delta) {
+    const item = cart.find(i => i.id === pid);
+    if (!item) return;
+    item.qty = Math.max(1, item.qty + delta);
+    renderCart();
+  }
+
+  function renderCart() {
+    const container = document.getElementById('cart-items');
+    const summary   = document.getElementById('cart-summary');
+    const actions   = document.getElementById('cart-actions');
+    const heading   = document.getElementById('cart-heading');
+
+    const total_items = cart.reduce((s, i) => s + i.qty, 0);
+    heading.textContent = total_items > 0
+      ? `Ihr Warenkorb (${total_items} Position${total_items === 1 ? '' : 'en'})`
+      : 'Ihr Warenkorb';
+
+    if (cart.length === 0) {
+      container.innerHTML = '<div class="cart-empty">Ihr Warenkorb ist leer.</div>';
+      summary.style.display = 'none';
+      actions.style.display = 'none';
+      return;
+    }
+
+    container.innerHTML = cart.map(item => {
+      const p = PRODUCTS[item.id];
+      const lineTotal = (p.price * item.qty).toFixed(2).replace('.', ',');
+      return `
+        <div class="cart-item">
+          <div class="cart-item-img"><img src="${p.img}" alt="${p.name}"></div>
+          <div class="cart-item-body">
+            <div class="cart-item-name">${p.name}</div>
+            <div class="cart-item-unit">(${p.price.toFixed(2).replace('.', ',')} € / Stück)</div>
+            <div class="cart-item-qty">
+              <div class="cart-qty-ctrl">
+                <button class="cqbtn" onclick="changeCartQty(${item.id},-1)">−</button>
+                <input class="cqval" type="number" value="${item.qty}" min="1"
+                  onchange="cart.find(i=>i.id===${item.id}).qty=Math.max(1,parseInt(this.value)||1);renderCart();">
+                <button class="cqbtn" onclick="changeCartQty(${item.id},1)">+</button>
+              </div>
+              <span class="cart-item-price">${lineTotal} €</span>
+            </div>
+          </div>
+          <div class="cart-item-del" onclick="removeFromCart(${item.id})" title="Entfernen">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+              <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+            </svg>
+          </div>
+        </div>`;
+    }).join('');
+
+    const subtotal = cart.reduce((s, i) => s + PRODUCTS[i.id].price * i.qty, 0);
+    const total    = subtotal + SHIPPING;
+    const vat      = total * 19 / 119;
+    document.getElementById('cart-subtotal').textContent = subtotal.toFixed(2).replace('.', ',') + ' €';
+    document.getElementById('cart-total').textContent    = total.toFixed(2).replace('.', ',') + ' €';
+    document.getElementById('cart-vat').textContent      = `inkl. MwSt. (${vat.toFixed(2).replace('.', ',')} €)`;
+    summary.style.display = '';
+    actions.style.display = '';
+    updateCartBadge();
+  }
+
+  function loadMore() {
+    if (loadCount >= EXTRA_ROWS.length) return;
+    const grid = document.getElementById('plp-grid-2');
+    const newCards = [];
+    for (let r = 0; r < ROWS_PER_CLICK && loadCount < EXTRA_ROWS.length; r++) {
+      EXTRA_ROWS[loadCount++].forEach(pid => {
+        const card = makeCard(PRODUCTS[pid]);
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(28px)';
+        grid.appendChild(card);
+        newCards.push(card);
+      });
+    }
+    // Stagger-Animation
+    newCards.forEach((card, i) => {
+      setTimeout(() => {
+        card.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+      }, i * 60);
+    });
+    if (loadCount >= EXTRA_ROWS.length) {
+      document.getElementById('load-more-row').style.display = 'none';
+    }
+  }
+
+
+
+  /* ── Multi-Step Checkout ── */
+  let checkoutStep = 1;
+  function nextCheckoutStep() {
+    const steps = [null,
+      document.getElementById('co-step1'),
+      document.getElementById('co-step2'),
+      document.getElementById('co-step3')
+    ];
+    if (checkoutStep < 3) {
+      steps[checkoutStep].style.display = 'none';
+      checkoutStep++;
+      steps[checkoutStep].style.display = 'block';
+      if (checkoutStep === 3) renderStep3();
+      updateCheckoutUI();
+      window.scrollTo({top:0,behavior:'instant'});
+    }
+  }
+  const STEP_NAMES = ['Versand', 'Bezahlung', 'Bestellung abschließen'];
+  const STEP_LABELS = ['1. Versand', '2. Bezahlung', '3. Bestellung abschließen'];
+  const CHECK_SVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+  function updateCheckoutUI() {
+    const activeCount = checkoutStep;
+    document.querySelectorAll('#screen-checkout .co-bar').forEach((b,i) => b.classList.toggle('active', i<activeCount));
+    document.querySelectorAll('#screen-checkout .co-step').forEach((s,i) => {
+      const done = i < checkoutStep - 1;
+      const current = i === checkoutStep - 1;
+      s.classList.toggle('active', current);
+      s.classList.toggle('completed', done);
+      if (done) s.innerHTML = CHECK_SVG + STEP_NAMES[i];
+      else s.textContent = STEP_LABELS[i];
+    });
+  }
+  function renderStep3() {
+    const el = document.getElementById('co3-items');
+    el.innerHTML = cart.map(item => {
+      const p = PRODUCTS[item.id];
+      const total = (p.price * item.qty).toFixed(2).replace('.',',');
+      return `<div class="co3-item">
+        <div class="co3-thumb"><img src="${p.img}" alt="${p.name}"></div>
+        <div class="co3-info">
+          <div class="co3-name">${p.name}</div>
+          <div class="co3-unit">(${p.price.toFixed(2).replace('.',',')} € / Stück)</div>
+          <div class="co3-qty">Menge: ${item.qty}</div>
+        </div>
+        <div class="co3-price">${total} €</div>
+      </div>`;
+    }).join('');
+  }
+  function prevCheckoutStep() {
+    const steps = [null,
+      document.getElementById('co-step1'),
+      document.getElementById('co-step2'),
+      document.getElementById('co-step3')
+    ];
+    if (checkoutStep > 1) {
+      steps[checkoutStep].style.display = 'none';
+      checkoutStep--;
+      steps[checkoutStep].style.display = 'block';
+      updateCheckoutUI();
+      window.scrollTo({top:0,behavior:'instant'});
+    } else { navigate('plp'); }
+  }
+  function selectRadio(el) {
+    const grp = el.closest('.co-radios, .co-radios-grp, .co-delivery');
+    if (!grp) return;
+    grp.querySelectorAll('.co-radio').forEach(r => {
+      r.classList.remove('sel');
+      r.querySelector('.co-rd').style.display = 'none';
+    });
+    el.classList.add('sel');
+    el.querySelector('.co-rd').style.display = 'block';
+  }
+
+  function positionDeliveryCaret(tabEl) {
+    const notch = document.getElementById('delivery-notch');
+    const outer = document.getElementById('co-delivery-outer');
+    if (!notch || !outer || !tabEl) return;
+    const outerRect = outer.getBoundingClientRect();
+    const tabRect = tabEl.getBoundingClientRect();
+    notch.style.left = (tabRect.left - outerRect.left + tabRect.width / 2) + 'px';
+  }
+  function selectDeliveryTab(el, idx) {
+    document.querySelectorAll('.co-dtab').forEach(t => t.classList.remove('sel'));
+    el.classList.add('sel');
+    updateDeliveryForm(idx);
+    positionDeliveryCaret(el);
+  }
+  window.addEventListener('load', function() {
+    const firstTab = document.querySelector('.co-dtab.sel');
+    positionDeliveryCaret(firstTab);
+  });
+  function updateDeliveryForm(idx) {
+    ['co-form-versand','co-form-hauspost','co-form-abholung'].forEach((id, i) => {
+      document.getElementById(id).style.display = i === idx ? 'block' : 'none';
+    });
+  }
+
+  function updatePaymentForm(idx) {
+    [0, 1, 2].forEach(i => {
+      document.getElementById('co-pay-' + i).style.display = i === idx ? 'block' : 'none';
+    });
+  }
+  function toggleVoucher(cb, id) {
+    const row = document.getElementById(id);
+    if (cb.checked) row.classList.add('visible');
+    else row.classList.remove('visible');
+  }
+  /* ── Checkout navigation ── */
+  function goToCheckout() {
+    closeCart();
+    renderCheckoutSummary();
+    navigate('checkout');
+  }
+
+  function renderCheckoutSummary() {
+    const count = cart.reduce((s, i) => s + i.qty, 0);
+    document.getElementById('co-order-heading').textContent =
+      count > 0 ? `Ihre Bestellung (${count} Position${count===1?'':'en'})` : 'Ihre Bestellung';
+    const thumbsEl = document.getElementById('co-thumbs');
+    const shown = cart.slice(0, 3);
+    const extraPositions = cart.length - shown.length; // extra unique products not shown
+    thumbsEl.innerHTML = shown.map(item =>
+      `<div class="co-thumb"><img src="${PRODUCTS[item.id].img}" alt=""></div>`
+    ).join('') + (extraPositions > 0 ? `<span class="co-more">+${extraPositions}</span>` : '');
+    // Totals
+    const subtotal = cart.reduce((s,i)=>s+PRODUCTS[i.id].price*i.qty, 0);
+    const total = subtotal + 3.90;
+    const vat = total * 19 / 119;
+    document.getElementById('co-subtotal').textContent = subtotal.toFixed(2).replace('.',',')+' €';
+    document.getElementById('co-total').textContent    = total.toFixed(2).replace('.',',')+' €';
+    document.getElementById('co-mwst').textContent     = `inkl. MwSt. (${vat.toFixed(2).replace('.',',')} €)`;
+  }
+
+  // selectAnrede merged into selectRadio
+
+  /* ── Update Warenkorb badge on all header buttons ── */
+  function updateCartBadge() {
+    const count = cart.reduce((s,i)=>s+i.qty,0);
+    document.querySelectorAll('.btn-hdr').forEach(btn => {
+      const svg = btn.querySelector('svg');
+      if (!svg) return;
+      // Check if this is a cart button by path content
+      const txt = btn.textContent.trim();
+      if (txt.startsWith('Warenkorb')) {
+        // Replace text node
+        Array.from(btn.childNodes).forEach(n => {
+          if (n.nodeType === 3) n.remove();
+        });
+        btn.appendChild(document.createTextNode(count > 0 ? `Warenkorb (${count})` : 'Warenkorb'));
+      }
+    });
+  }
+
+  /* Header-Border nur beim Scrollen */
+  window.addEventListener('scroll', () => {
+    const scrolled = window.scrollY > 0;
+    document.querySelectorAll('.header').forEach(h => h.classList.toggle('scrolled', scrolled));
+  });
+
+  function navigate(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + id).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    if (id === 'pdp') { document.getElementById('info-extra').classList.remove('open'); document.getElementById('mehr-link').style.removeProperty('display'); }
+  }
+  const CAT_MAP = {
+    'Alle Artikel':         'all',
+    'Büro & Schreibwaren':  'buero',
+    'Sportartikel':         'sport',
+    'Essen & Trinken':      'essen',
+    'Taschen & Rucksäcke':  'taschen',
+    'Saisonartikel':        'saison'
+  };
+
+  function setFilter(el) {
+    document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    const cat = CAT_MAP[el.textContent.trim()] || 'all';
+    filterByCategory(cat);
+  }
+
+  function filterByCategory(cat) {
+    const grid = document.getElementById('plp-grid');
+    const cards = Array.from(grid.querySelectorAll('.card'));
+
+    // Staggered fade-out
+    cards.forEach((c, i) => {
+      c.style.transition = `opacity 0.1s ${i*20}ms, transform 0.1s ${i*20}ms`;
+      c.style.opacity = '0';
+      c.style.transform = 'scale(0.95) translateY(6px)';
+    });
+
+    setTimeout(() => {
+      // Alle 6 Produkte bleiben erhalten – nur REIHENFOLGE ändert sich:
+      // Gewählte Kategorie kommt zuerst, der Rest folgt in Original-Reihenfolge
+      let sorted;
+      if (cat === 'all') {
+        sorted = [...PRODUCTS].sort((a,b) => a.id - b.id);
+      } else {
+        const match   = PRODUCTS.filter(p => p.category === cat);
+        const others  = PRODUCTS.filter(p => p.category !== cat);
+        sorted = [...match, ...others];
+      }
+
+      grid.innerHTML = '';
+      sorted.forEach(p => grid.appendChild(makeCard(p)));
+
+      // Staggered fade-in
+      Array.from(grid.querySelectorAll('.card')).forEach((c, i) => {
+        c.style.transition = 'none';
+        c.style.opacity = '0';
+        c.style.transform = 'scale(0.95) translateY(6px)';
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            c.style.transition = `opacity 0.2s ${i*50}ms, transform 0.2s ${i*50}ms`;
+            c.style.opacity = '1';
+            c.style.transform = 'scale(1) translateY(0)';
+          }, 20);
+        });
+      });
+    }, cards.length * 20 + 130);
+  }
+  window._currentUnitPrice = 14.90;
+  function changeQty(d) { const i = document.getElementById('qty'); let v = Math.max(1, parseInt(i.value) + d); i.value = v; document.getElementById('total-price').textContent = (v * window._currentUnitPrice).toFixed(2).replace('.', ',') + ' €'; }
+  document.getElementById('qty').addEventListener('change', function() { let v = Math.max(1, parseInt(this.value) || 1); this.value = v; document.getElementById('total-price').textContent = (v * window._currentUnitPrice).toFixed(2).replace('.', ',') + ' €'; });
+  function toggleInfo() { document.getElementById('info-extra').classList.add('open'); document.getElementById('mehr-link').style.display = 'none'; }
+  document.querySelectorAll('.pdp-th').forEach(t => { t.addEventListener('click', function() { document.querySelectorAll('.pdp-th').forEach(x => x.classList.remove('active')); this.classList.add('active'); }); });
+</script>
+
+<!-- ══════════════════════════
+  CHECKOUT
+══════════════════════════ -->
+<div id="screen-checkout" class="screen">
+  <header class="header">
+    <div class="hdr-inner">
+      <div class="logo" onclick="navigate('home')"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTg2IiBoZWlnaHQ9IjI2IiB2aWV3Qm94PSIwIDAgMTg2IDI2IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik03MS4zNDM3IDBDNjMuNjM3IDAgNjIuMDI1IDQuNTU3NzUgNjIuMDI1IDEyLjc5NDdDNjIuMDI1IDIwLjkzMzggNjIuNjIxOCAyNS41NTk5IDY5LjI0NjIgMjUuNTU5OUM3MS40NTI4IDI1LjU1OTkgNzMuNzYyNCAyNS4wMTE1IDc0LjYzOTcgMjIuOTA2Nkg3NC43Mjk2TDc0Ljg0OTUgMjUuMDg4Mkg3OS4yODQxVjExLjcwMzlINzAuODY0M1YxNi4wNjcxSDczLjE3MTVDNzMuMTM3OSAyMC4zNzcxIDcyLjM0ODEgMjEuMjI2MyA3MC45ODQxIDIxLjIyNjJDNjguOTg4NSAyMS4yMjYyIDY4Ljc2NjggMTkuNDQ4IDY4Ljc2NjggMTIuNzk0N0M2OC43NjY4IDYuMTM3OTEgNjguOTY3IDQuMzMzNzEgNzEuMTA0IDQuMzMzNjhDNzEuODc0NyA0LjMzMzY4IDcyLjM2MjUgNC43MDc0OSA3Mi42MDIyIDUuMzk0OTlDNzIuODUwMyA2LjA0ODI5IDcyLjk2MTcgNy4wMTUyNiA3Mi45NjE3IDguMjU0NTlINzkuMjg0MUM3OS4yODQxIDIuMjkzNjEgNzUuOTY4OSAwIDcxLjM0MzcgMFpNMCAwLjQ3MTY5M0w1LjQyMzQ0IDI1LjA4ODJIMTMuODEzM0wxOS4yMDY4IDAuNDcxNjkzSDEyLjI4NTFMOS42NDgzMyAxOS4wMTUxSDkuNTg4NEw2Ljk1MTU5IDAuNDcxNjkzSDBaTTE5Ljc0NjEgMC40NzE2OTNWMjUuMDg4MkgyNi4yNDgyVjE0Ljk0NjhIMzAuMjYzNFYyNS4wODgySDM2Ljc2NTVWMC40NzE2OTNIMzAuMjYzNFY5LjQ5Mjg4SDI2LjI0ODJWMC40NzE2OTNIMTkuNzQ2MVpNMzcuMzA0OSAwLjQ3MTY5M0w0Mi42OTgzIDI1LjA4ODJINTEuMTE4Mkw1Ni41MTE2IDAuNDcxNjkzSDQ5LjU2TDQ2LjkyMzIgMTkuMDE1MUg0Ni44NjMzTDQ0LjIyNjUgMC40NzE2OTNIMzcuMzA0OVpNODEuNDExNSAwLjQ3MTY5M1YyNS4wODgySDg3Ljk0MzZWMTUuMjQxNkg4OS42NTE1QzkxLjIyMjggMTUuMjQxNiA5MS43NzkgMTUuOTUzOSA5MS43NzkgMTguNzQ5OFYyMC40MDA3QzkxLjc3OSAyMS40MzczIDkxLjc3NzggMjMuNzc2OSA5Mi40MDgyIDI1LjA4ODJIOTkuMzU5OFYyNC43MzQ0Qzk4LjkzNzkgMjQuNTMwNSA5OC43ODQ1IDI0LjI3NTggOTguNjEwNyAyMy45OTc1Qzk4LjI5NTUgMjMuNTEzOSA5OC4zMTExIDIxLjg1NDcgOTguMzExMSAyMC41Nzc3VjE4LjQ4NDVDOTguMzExMSAxNS4yMDg2IDk3LjM2MDYgMTMuMjIwNCA5NC4yMDYgMTIuOTQyMVYxMi44ODMxQzk3LjE4MzIgMTIuNDI5MSA5OC40OTA5IDEwLjI5NTkgOTguNDkwOSA3LjAxNjQ5Qzk4LjQ5MDkgMy4yMjYzOCA5Ni41NzMyIDAuNDcxNjkzIDkxLjU5OTIgMC40NzE2OTNIODEuNDExNVpNMTAwLjczOCAwLjQ3MTY5M1YxNi41OTc3QzEwMC43MzggMjMuNDkwMyAxMDMuNzQ5IDI1LjU1OTkgMTA5LjIxOCAyNS41NTk5QzExNC42ODMgMjUuNTU5OSAxMTcuNjY4IDIzLjQ5MDMgMTE3LjY2OCAxNi41OTc3VjAuNDcxNjkzSDExMS4xNjZWMTguMjE5MkMxMTEuMTY2IDIwLjYgMTEwLjQ0IDIxLjIyNjMgMTA5LjIxOCAyMS4yMjYyQzEwNy45OTEgMjEuMjI2MiAxMDcuMjQgMjAuNiAxMDcuMjQgMTguMjE5MlYwLjQ3MTY5M0gxMDAuNzM4Wk0xMTkuNzA1IDAuNDcxNjkzVjI1LjA4ODJIMTI2LjIzN1YxNS43MTMzSDEyOC41MTVDMTMzLjgwNiAxNS43MTMzIDEzNi43MjUgMTMuMDg2IDEzNi43MjUgOC4wNDgyN0MxMzYuNzI1IDMuNzQ1MjUgMTM0LjQ4IDAuNDcxNjkzIDEyOS41MDMgMC40NzE2OTNIMTE5LjcwNVpNMTM4LjAxMyAwLjQ3MTY5M1YyNS4wODgySDE0NC41MTVWMTUuNzEzM0gxNDYuNzkyQzE1Mi4wODQgMTUuNzEzMyAxNTUuMDAyIDEzLjA4NiAxNTUuMDAyIDguMDQ4MjdDMTU1LjAwMiAzLjc0NTI1IDE1Mi43NTkgMC40NzE2OTMgMTQ3Ljc4MSAwLjQ3MTY5M0gxMzguMDEzWk0xNTYuNTMxIDAuNDcxNjkzVjI1LjA4ODJIMTcxLjY5MlYxOS44NDA2SDE2My4wNjNWMTQuOTQ2OEgxNzAuODUzVjkuOTM1MDRIMTYzLjA2M1Y1LjcxOTI4SDE3MS4zNjNWMC40NzE2OTNIMTU2LjUzMVpNODcuOTQzNiA1LjEwMDE5SDg5LjIwMjFDOTEuMTYyOSA1LjEwMDE5IDkxLjk1ODggNS45NjMzNiA5MS45NTg4IDcuOTU5ODhDOTEuOTU4OCA5LjcxNTcxIDkxLjA5MSAxMC44Nzg0IDg5LjIzMjEgMTAuODc4NEg4Ny45NDM2VjUuMTAwMTlaTTEyNi4yMzcgNS4xMDAxOUgxMjcuNDY2QzEyOS4xMTQgNS4xMDAxOSAxMjkuOTgzIDYuMDQ3MTMgMTI5Ljk4MyA4LjA3NzhDMTI5Ljk4MyAxMC4xNDk3IDEyOS4xMTQgMTEuMDg0OCAxMjcuNDY2IDExLjA4NDhIMTI2LjIzN1Y1LjEwMDE5Wk0xNDQuNTE1IDUuMTAwMTlIMTQ1Ljc0NEMxNDcuMzg4IDUuMTAwMTkgMTQ4LjI2MSA2LjA0NzEzIDE0OC4yNjEgOC4wNzc4QzE0OC4yNjEgMTAuMTQ5NyAxNDcuMzg4IDExLjA4NDggMTQ1Ljc0NCAxMS4wODQ4SDE0NC41MTVWNS4xMDAxOVoiIGZpbGw9IiM0MDUxNjQiLz48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTE3NC43MDQgMjUuNTU5OUgxODAuMjgzTDE4NiAwSDE4MC40MjJMMTc0LjcwNCAyNS41NTk5WiIgZmlsbD0iIzk5QTMxOSIvPjwvc3ZnPg==" alt="VHV Gruppe"></div>
+      <div class="hdr-btns">
+        <button class="btn-hdr" id="co-cart-btn" onclick="openCart(false)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          Warenkorb
+        </button>
+        <button class="btn-hdr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Mein Konto</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="co-page">
+
+    <!-- ── Volle Breite: Titel + Subtitle + Steps ── -->
+    <div class="co-top">
+      <h1 class="co-title">Ihre Bestellung</h1>
+      <p class="co-subtitle">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor.</p>
+      <div class="co-steps">
+        <div class="co-step active">1. Versand</div>
+        <div class="co-step">2. Bezahlung</div>
+        <div class="co-step">3. Bestellung abschließen</div>
+      </div>
+      <!-- 6px Fortschrittsbalken, abgerundet, 8px Gap -->
+      <div class="co-bars">
+        <div class="co-bar active"></div>
+        <div class="co-bar"></div>
+        <div class="co-bar"></div>
+      </div>
+    </div>
+
+    <!-- ── 2 Spalten: Form + Summary ── -->
+    <div class="co-wrap" style="margin-top:48px;">
+
+      <!-- Left: Formular -->
+      <div class="co-main">
+        <div id="co-step1">
+
+        <!-- Lieferoption: horizontale Tabs -->
+        <div class="co-lbl">Wie möchten Sie Ihre Bestellung erhalten?</div>
+        <div class="co-dtabs-wrap">
+          <div class="co-dtabs">
+            <div class="co-dtab sel" onclick="selectDeliveryTab(this, 0)">
+              <span class="co-dtab-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </span>
+              <span class="co-dtab-lbl">Versand an Adresse</span>
+            </div>
+            <div class="co-dtab" onclick="selectDeliveryTab(this, 1)">
+              <span class="co-dtab-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2 7 12 13 22 7"/></svg>
+              </span>
+              <span class="co-dtab-lbl">Interne Hauspost</span>
+            </div>
+            <div class="co-dtab" onclick="selectDeliveryTab(this, 2)">
+              <span class="co-dtab-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+              </span>
+              <span class="co-dtab-lbl">Selbstabholung</span>
+            </div>
+          </div><!-- /co-dtabs -->
+        </div><!-- /co-dtabs-wrap -->
+
+        <div class="co-dform-outer" id="co-delivery-outer">
+          <div class="co-dtab-notch" id="delivery-notch"></div>
+          <div class="co-dform-wrap">
+          <!-- Formular: Versand an Adresse -->
+          <div id="co-form-versand">
+            <div class="co-lbl" style="font-size:16px;font-weight:500;margin-bottom:16px;">Ihre Versandadresse</div>
+            <div class="co-radios-grp">
+              <div class="co-radio sel" onclick="selectRadio(this)"><div class="co-rc"><div class="co-rd"></div></div>Herr</div>
+              <div class="co-radio" onclick="selectRadio(this)"><div class="co-rc"><div class="co-rd" style="display:none"></div></div>Frau</div>
+              <div class="co-radio" onclick="selectRadio(this)"><div class="co-rc"><div class="co-rd" style="display:none"></div></div>Divers</div>
+            </div>
+            <div class="fld-row">
+              <div class="fld"><input type="text" id="co-vorname" placeholder=" "><label for="co-vorname">Vorname</label></div>
+              <div class="fld"><input type="text" id="co-nachname" placeholder=" "><label for="co-nachname">Nachname</label></div>
+            </div>
+            <div class="fld"><input type="text" id="co-strasse" placeholder=" "><label for="co-strasse">Straße &amp; Hausnummer</label></div>
+            <div class="fld-row">
+              <div class="fld" style="flex:0 0 160px;"><input type="text" id="co-plz" placeholder=" "><label for="co-plz">PLZ</label></div>
+              <div class="fld"><input type="text" id="co-ort" placeholder=" "><label for="co-ort">Ort</label></div>
+            </div>
+            <div class="fld"><input type="tel" id="co-tel" placeholder=" "><label for="co-tel">Telefonnummer</label></div>
+            <div class="fld"><input type="email" id="co-email" placeholder=" "><label for="co-email">E-Mail-Adresse</label></div>
+            <label class="co-check" style="margin-top:16px;"><input type="checkbox">Die Lieferadresse weicht von der Rechnungsadresse ab</label>
+          </div>
+
+          <!-- Formular: Interne Hauspost -->
+          <div id="co-form-hauspost" style="display:none">
+            <div class="co-lbl" style="font-size:16px;font-weight:500;margin-bottom:16px;">Ihre Versandadresse (Interne Hauspost)</div>
+            <div class="co-radios-grp">
+              <div class="co-radio sel" onclick="selectRadio(this)"><div class="co-rc"><div class="co-rd"></div></div>Herr</div>
+              <div class="co-radio" onclick="selectRadio(this)"><div class="co-rc"><div class="co-rd" style="display:none"></div></div>Frau</div>
+              <div class="co-radio" onclick="selectRadio(this)"><div class="co-rc"><div class="co-rd" style="display:none"></div></div>Divers</div>
+            </div>
+            <div class="fld-row">
+              <div class="fld"><input type="text" placeholder=" "><label>Vorname</label></div>
+              <div class="fld"><input type="text" placeholder=" "><label>Nachname</label></div>
+            </div>
+            <div class="fld"><input type="text" placeholder=" "><label>Organisationskürzel (z.B. HWI-03)</label></div>
+            <div class="pdp-size-wrap" style="display:block; padding-top:0; margin-bottom:16px; position:relative;">
+              <select class="pdp-size selected">
+                <option value="" selected>Standort</option>
+                <option>Hannover</option><option>Hamburg</option><option>Berlin</option><option>München</option>
+              </select>
+              <div class="pdp-size-chevron" style="top:50%;transform:translateY(-50%);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+            </div>
+            <div class="fld"><input type="text" placeholder=" "><label>Straße &amp; Hausnummer</label></div>
+            <div class="fld-row">
+              <div class="fld" style="flex:0 0 160px;"><input type="text" placeholder=" "><label>PLZ</label></div>
+              <div class="fld"><input type="text" placeholder=" "><label>Ort</label></div>
+            </div>
+            <div class="fld"><input type="tel" placeholder=" "><label>Telefonnummer</label></div>
+            <div class="fld"><input type="email" placeholder=" "><label>E-Mail-Adresse</label></div>
+            <label class="co-check" style="margin-top:16px;"><input type="checkbox">Die Lieferadresse weicht von der Rechnungsadresse ab</label>
+          </div>
+
+          <!-- Formular: Selbstabholung -->
+          <div id="co-form-abholung" style="display:none">
+            <div class="co-pickup-box" style="margin-bottom:0;">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+              <div class="co-pickup-txt">
+                <p>Ihre Bestellung steht bis spätestens <strong>Montag um 14.00 Uhr</strong> zur Abholung bereit. Abholzeiten täglich zwischen <strong>09.00 und 11.00 Uhr</strong>.</p>
+                <p>Für Bestellungen <strong>nach 14:00 Uhr</strong> gilt der jeweils nächste Werktag.</p>
+              </div>
+            </div>
+          </div><!-- /co-form-abholung -->
+          </div><!-- /co-dform-wrap -->
+        </div><!-- /co-dform-outer -->
+
+        <div class="co-submit">
+          <button class="co-back" onclick="navigate('plp')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>
+            Einkauf fortsetzen
+          </button>
+          <button class="btn-co" onclick="nextCheckoutStep()">Weiter zur Bezahlung →</button>
+        </div>
+        </div><!-- /co-step1 -->
+
+        <!-- SCHRITT 2: Bezahlung -->
+        <div id="co-step2" style="display:none;">
+          <div class="co-lbl">Welche Zahlungsweise bevorzugen Sie?</div>
+
+          <!-- Zahlungsoptionen als vertikale Liste -->
+          <div class="co-delivery">
+            <div class="co-radio sel" onclick="selectRadio(this); updatePaymentForm(0)">
+              <div class="co-rc"><div class="co-rd"></div></div>Kostenstelle
+            </div>
+            <div class="co-radio" onclick="selectRadio(this); updatePaymentForm(1)">
+              <div class="co-rc"><div class="co-rd" style="display:none"></div></div>Projektstrukturplanelement
+            </div>
+            <div class="co-radio" onclick="selectRadio(this); updatePaymentForm(2)">
+              <div class="co-rc"><div class="co-rd" style="display:none"></div></div>Personalnummer
+            </div>
+          </div>
+
+          <!-- Dynamisches Eingabefeld je nach Zahlungsart -->
+          <div id="co-pay-0">
+            <div class="co-lbl">Kostenstelle</div>
+            <input class="co-fld-inp" type="text" placeholder="z.B. NW-847-00896-1">
+            <label class="co-check" style="margin-top:8px;"><input type="checkbox" onchange="toggleVoucher(this, 'voucher-0')">Geschenkgutschein-Code anwenden</label>
+            <div id="voucher-0" class="co-voucher">
+              <input type="text" placeholder="XXXX-XXX-XXX-XXXXX-X">
+              <button class="btn-voucher">Anwenden</button>
+            </div>
+          </div>
+          <div id="co-pay-1" style="display:none">
+            <div class="co-lbl">Projektstrukturplanelement</div>
+            <input class="co-fld-inp" type="text" placeholder="z.B. PSP-2024-001">
+            <label class="co-check" style="margin-top:8px;"><input type="checkbox" onchange="toggleVoucher(this, 'voucher-1')">Geschenkgutschein-Code anwenden</label>
+            <div id="voucher-1" class="co-voucher">
+              <input type="text" placeholder="XXXX-XXX-XXX-XXXXX-X">
+              <button class="btn-voucher">Anwenden</button>
+            </div>
+          </div>
+          <div id="co-pay-2" style="display:none">
+            <div class="co-lbl">Personalnummer</div>
+            <input class="co-fld-inp" type="text" placeholder="z.B. 12345678">
+            <label class="co-check" style="margin-top:8px;"><input type="checkbox" onchange="toggleVoucher(this, 'voucher-2')">Geschenkgutschein-Code anwenden</label>
+            <div id="voucher-2" class="co-voucher">
+              <input type="text" placeholder="XXXX-XXX-XXX-XXXXX-X">
+              <button class="btn-voucher">Anwenden</button>
+            </div>
+          </div>
+
+          <!-- Hinweisbox Lieferzeit -->
+          <div class="co-pickup-box" style="margin-top:32px;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8">
+              <rect x="3" y="4" width="18" height="18" rx="0" ry="0"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><circle cx="15" cy="16" r="2.5"/><line x1="15" y1="14.5" x2="15" y2="16"/><line x1="15" y1="16" x2="16.5" y2="16"/>
+            </svg>
+            <div class="co-pickup-txt">
+              <p>Für die zusammengestellten Artikel in Ihrem Warenkorb ist bei heutiger Bestellung ein <strong>Versand in 5 Tagen</strong> vorgesehen.</p>
+            </div>
+          </div>
+
+          <div class="co-submit" style="margin-top:48px;">
+            <button class="co-back" onclick="prevCheckoutStep()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>
+              Zurück
+            </button>
+            <button class="btn-co" onclick="nextCheckoutStep()">Weiter zur Bestellübersicht →</button>
+          </div>
+        </div><!-- /co-step2 -->
+        <!-- SCHRITT 3: Bestellübersicht -->
+        <div id="co-step3" style="display:none;">
+          <div class="co-lbl">Ihre Bestellung</div>
+          <div id="co3-items"></div>
+
+          <div class="co-lbl" style="margin-top:48px;">Versand &amp; Bezahlung</div>
+          <div class="co3-address-box">
+            <div class="co3-addr-col">
+              <svg class="co3-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
+              <div class="co3-addr-lbl">Lieferanschrift</div>
+              <div class="co3-addr-val">Firma Muster Innovation GmbH<br>Max Mustermann<br>Lange-Muster-Allee 21<br>30161 Berlin</div>
+            </div>
+            <div class="co3-addr-col">
+              <svg class="co3-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="12" y2="15"/></svg>
+              <div class="co3-addr-lbl">Rechnungsanschrift</div>
+              <div class="co3-addr-val">Entspricht der Lieferadresse</div>
+            </div>
+            <div class="co3-addr-col" style="padding-right:0;">
+              <svg class="co3-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M14.5 9a2.5 2 0 0 0-5 0c0 3 5 3 5 6a2.5 2 0 0 1-5 0"/><line x1="12" y1="7" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="17"/></svg>
+              <div class="co3-addr-lbl">Zahlungsart</div>
+              <div class="co3-addr-val">Abrechnung über Personalnummer</div>
+            </div>
+            <button class="co3-edit">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              Bearbeiten
+            </button>
+          </div>
+
+          <div class="co-submit" style="margin-top:48px;">
+            <button class="co-back" onclick="prevCheckoutStep()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>
+              Zurück
+            </button>
+            <button class="btn-co">Jetzt zahlungspflichtig bestellen</button>
+          </div>
+        </div><!-- /co-step3 -->
+      </div>
+
+      <!-- Right: Zusammenfassung -->
+      <div class="co-side">
+        <div class="co-box">
+          <div class="co-box-h" id="co-order-heading">Ihre Bestellung</div>
+          <div class="co-thumbs" id="co-thumbs"></div>
+          <button class="co-show" onclick="openCart(false)">→ Anzeigen</button>
+          <hr class="co-div">
+          <div class="co-sum-h">Zusammenfassung</div>
+          <div class="co-row"><span>Zwischensumme</span><span id="co-subtotal">–</span></div>
+          <div class="co-row"><span>Versandkosten</span><span>3,90 €</span></div>
+          <hr class="co-div">
+          <div class="co-row co-total"><span>Gesamtsumme</span><span id="co-total">–</span></div>
+          <div class="co-mwst" id="co-mwst"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer-wrapper">
+    <footer class="footer">
+      <div class="ft-inner">
+        <div class="ft-l">
+          <p class="ft-q"><em>Sie haben Fragen</em> zu unseren Artikeln oder Ihrer Bestellung?</p>
+          <div class="ft-contact"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Schreiben Sie uns!</div>
+        </div>
+        <div class="ft-c">
+          <div class="ft-socials">
+            <div class="ft-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></div>
+            <div class="ft-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></div>
+          </div>
+          <div class="ft-links">Seitenübersicht / Datenschutz / Impressum / Cookie-Einstellungen</div>
+          <div class="ft-copy">© 2026 VHV Gruppe</div>
+        </div>
+      </div>
+    </footer>
+    <div class="ft-tw">
+      <div class="ft-t" style="left:216px;top:0;background:#fa5f07"></div>
+      <div class="ft-t" style="left:144px;top:72px;background:#b7bf00"></div>
+      <div class="ft-t" style="left:216px;top:72px;background:#3db7e4"></div>
+      <div class="ft-t" style="left:72px;top:144px;background:#c51101"></div>
+      <div class="ft-t" style="left:144px;top:144px;background:#0e2546"></div>
+      <div class="ft-t" style="left:216px;top:216px;background:#f1ab01"></div>
+    </div>
+  </div>
+</div><!-- /checkout -->
+
+</body>
+</html>
