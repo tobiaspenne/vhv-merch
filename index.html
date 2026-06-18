@@ -1608,15 +1608,10 @@
             <div class="cart-item-name">${nm}</div>
             <div class="cart-item-unit">(${p.price.toFixed(2).replace('.', ',')} € / Stück)</div>
             <div class="cart-item-qty">
-              <div class="cart-qty-ctrl">
-                <button class="cqbtn" onclick="changeOrderQty(${i},-1)">−</button>
-                <input class="cqval" value="${it.qty}" readonly>
-                <button class="cqbtn" onclick="changeOrderQty(${i},1)">+</button>
-              </div>
+              <span class="cart-item-unit">Menge: ${it.qty}</span>
               <span class="cart-item-price">${line} €</span>
             </div>
           </div>
-          <div class="cart-item-del" onclick="removeOrderItem(${i})">${TRASH_SVG}</div>
         </div>`;
       }).join('');
     }
@@ -2042,7 +2037,7 @@
                 <div id="voucher-0" class="co-voucher">
                   <div class="co-voucher-field">
                     <svg class="co-voucher-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                    <input type="text" placeholder="XXXX-XXX-XXX-XXXXX-X">
+                    <input type="text" placeholder="z.B. 123-456-789-000-X">
                   </div>
                   <button class="btn-voucher" onclick="applyVoucher(this)">Anwenden</button>
                 </div>
@@ -2057,7 +2052,7 @@
                 <div id="voucher-1" class="co-voucher">
                   <div class="co-voucher-field">
                     <svg class="co-voucher-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                    <input type="text" placeholder="XXXX-XXX-XXX-XXXXX-X">
+                    <input type="text" placeholder="z.B. 123-456-789-000-X">
                   </div>
                   <button class="btn-voucher" onclick="applyVoucher(this)">Anwenden</button>
                 </div>
@@ -2072,7 +2067,7 @@
                 <div id="voucher-2" class="co-voucher">
                   <div class="co-voucher-field">
                     <svg class="co-voucher-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                    <input type="text" placeholder="XXXX-XXX-XXX-XXXXX-X">
+                    <input type="text" placeholder="z.B. 123-456-789-000-X">
                   </div>
                   <button class="btn-voucher" onclick="applyVoucher(this)">Anwenden</button>
                 </div>
