@@ -571,6 +571,47 @@
     }
     .btn-continue:hover { background: rgba(250,95,7,0.04); }
     .cart-empty { padding: 48px 24px; text-align: center; color: var(--g60); font-size: 16px; }
+
+    /* ── DANKE-SEITE ── */
+    .tk-wrap { max-width: 1272px; margin: 0 auto; padding: 56px 24px 120px; }
+    .tk-h { font-size: 48px; font-weight: 700; line-height: 1.1; color: var(--navy); }
+    .tk-sub { font-size: 18px; line-height: 26px; color: var(--gtxt); margin-top: 16px; }
+    .tk-box { background: var(--gbg); padding: 32px; margin-top: 40px; }
+    .tk-box-h { font-size: 22px; font-weight: 500; color: var(--navy); margin-bottom: 16px; }
+    .tk-box-p { font-size: 16px; line-height: 26px; color: var(--gtxt); margin-bottom: 24px; max-width: 1000px; }
+    .tk-inner { background: #fff; padding: 28px 32px; display: flex; flex-direction: column; gap: 24px; }
+    .tk-step { display: flex; align-items: center; gap: 16px; font-size: 16px; line-height: 24px; color: var(--navy); }
+    .tk-num { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--green); color: var(--navy); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 500; flex-shrink: 0; }
+    .tk-actions { display: flex; gap: 16px; margin-top: 32px; flex-wrap: wrap; }
+
+    /* ── MEIN KONTO ── */
+    .acc-wrap { max-width: 1272px; margin: 0 auto; padding: 48px 24px 120px; }
+    .acc-title { font-size: 48px; font-weight: 700; line-height: 1.1; color: var(--navy); margin-bottom: 12px; }
+    .acc-sub { font-size: 18px; line-height: 26px; color: var(--gtxt); max-width: 600px; }
+    .acc-box { background: var(--gbg); padding: 32px; margin-top: 24px; }
+    .acc-box-h { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 500; color: var(--navy); margin-bottom: 20px; }
+    .acc-box-h svg { color: var(--green); flex-shrink: 0; }
+    .acc-box-h .acc-box-sub { font-weight: 400; color: var(--gtxt); font-size: 16px; }
+    .acc-row { display: flex; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--g20); font-size: 16px; }
+    .acc-row:last-child { border-bottom: none; }
+    .acc-row-label { flex: 0 0 280px; color: var(--gtxt); }
+    .acc-row-val { color: var(--navy); font-weight: 500; }
+    /* Limit-Balken */
+    .acc-limit-bar { position: relative; height: 12px; background: var(--g20); border-radius: 6px; margin: 44px 0 10px; }
+    .acc-limit-fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--green); border-radius: 6px; }
+    .acc-limit-tip { position: absolute; top: -34px; transform: translateX(-50%); background: var(--dark); color: #fff; font-size: 13px; font-weight: 500; padding: 4px 8px; border-radius: 4px; white-space: nowrap; }
+    .acc-limit-tip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 5px solid transparent; border-top-color: var(--dark); }
+    .acc-limit-ends { display: flex; justify-content: space-between; font-size: 14px; color: var(--gtxt); }
+    /* Bestellhistorie */
+    .acc-order { padding: 24px 0; border-bottom: 1px solid var(--g20); display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; }
+    .acc-order:last-child { border-bottom: none; }
+    .acc-order-date { font-size: 16px; font-weight: 500; color: var(--navy); margin-bottom: 12px; }
+    .acc-order-lbl { font-size: 16px; font-weight: 500; color: var(--navy); margin-bottom: 4px; }
+    .acc-order-val { font-size: 16px; line-height: 24px; color: var(--gtxt); }
+    .acc-order-btn { flex-shrink: 0; padding: 12px 20px; background: var(--orange); color: #fff; font-size: 16px; font-weight: 500; border-radius: 4px; border: none; cursor: pointer; font-family: inherit; white-space: nowrap; }
+    .acc-order-btn:hover { background: #d94f00; }
+    /* Offcanvas-Schließen (Kreis links) */
+    .order-close-x { position: fixed; top: 24px; left: 24px; width: 48px; height: 48px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 402; box-shadow: 0 2px 10px rgba(0,0,0,0.15); color: var(--navy); }
   </style>
 </head>
 <body>
@@ -604,6 +645,32 @@
 </div>
 
 <!-- ══════════════════════════
+  BESTELLDETAIL-OFFCANVAS
+══════════════════════════ -->
+<div class="cart-overlay" id="order-overlay" onclick="closeOrder()">
+  <div class="order-close-x" onclick="closeOrder()">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </div>
+</div>
+<div class="cart-panel" id="order-panel">
+  <div class="cart-head">
+    <h2 id="order-title">Bestellung</h2>
+    <div class="cart-close" onclick="closeOrder()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </div>
+  </div>
+  <div class="cart-items" id="order-items"></div>
+  <div class="cart-summary">
+    <div class="cart-sum-row"><span>Zwischensumme</span><span id="order-subtotal">0,00 €</span></div>
+    <div class="cart-sum-row"><span>Versandkosten</span><span>3,90 €</span></div>
+    <div class="cart-sum-row total"><span>Gesamtsumme</span><span id="order-total">0,00 €</span></div>
+  </div>
+  <div class="cart-actions">
+    <button class="btn-checkout" onclick="reorder()">Artikel erneut bestellen</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════
   HOME
 ══════════════════════════ -->
 <div id="screen-home" class="screen active">
@@ -618,7 +685,7 @@
       </nav>
       <div class="hdr-btns">
         <button class="btn-hdr" onclick="openCart(false)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Warenkorb</button>
-        <button class="btn-hdr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Mein Konto</button>
+        <button class="btn-hdr" onclick="navigate('account')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Mein Konto</button>
       </div>
     </div>
   </header>
@@ -763,7 +830,7 @@
   FAQ-SEITE
 ══════════════════════════ -->
 <div id="screen-faq" class="screen">
-  <div id="faq-header-slot"></div>
+  <div class="header-slot"></div>
   <div style="padding:48px 0 120px;">
     <div class="cnt" style="margin-bottom:56px;">
       <h1 class="faq-h" style="font-size:48px;">Unsere FAQ</h1>
@@ -771,8 +838,69 @@
     </div>
     <div id="faq-groups"></div>
   </div>
-  <div id="faq-footer-slot"></div>
+  <div class="footer-slot"></div>
 </div><!-- /faq -->
+
+
+<!-- ══════════════════════════
+  DANKE-SEITE
+══════════════════════════ -->
+<div id="screen-thanks" class="screen">
+  <div class="header-slot"></div>
+  <div class="tk-wrap">
+    <h1 class="tk-h">Vielen Dank! 🎉</h1>
+    <p class="tk-sub">Ihre Bestellung ist erfolgreich bei uns eingegangen.</p>
+    <div class="tk-box">
+      <div class="tk-box-h">So geht es jetzt weiter</div>
+      <p class="tk-box-p">Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+      <div class="tk-inner">
+        <div class="tk-step"><span class="tk-num">1</span>Sie erhalten eine Bestellbestätigung per E-Mail, die Rechnung befindet sich im Anhang</div>
+        <div class="tk-step"><span class="tk-num">2</span>Sobald Ihre Bestellung versandbereit ist, erhalten Sie eine Benachrichtigung, dies kann bis zu 7 Werktagen dauern</div>
+        <div class="tk-step"><span class="tk-num">3</span>Die Sendung wird Ihnen an die gewünschte Versandadresse zugestellt</div>
+      </div>
+      <div class="tk-actions">
+        <button class="btn-co" onclick="navigate('home')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>Zur Startseite</button>
+        <button class="btn-co" onclick="navigate('plp')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>Weiter einkaufen</button>
+      </div>
+    </div>
+  </div>
+  <div class="footer-slot"></div>
+</div><!-- /thanks -->
+
+
+<!-- ══════════════════════════
+  MEIN KONTO
+══════════════════════════ -->
+<div id="screen-account" class="screen">
+  <div class="header-slot"></div>
+  <div class="acc-wrap">
+    <button class="back" onclick="navigate('home')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>Zurück</button>
+    <h1 class="acc-title">Mein Konto</h1>
+    <p class="acc-sub">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor.</p>
+
+    <div class="acc-box">
+      <div class="acc-box-h"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Persönliche Daten</div>
+      <div class="acc-row"><div class="acc-row-label">E-Mail-Adresse:</div><div class="acc-row-val">max.mustermann@vhv-gruppe.de</div></div>
+      <div class="acc-row"><div class="acc-row-label">Vor- und Nachname:</div><div class="acc-row-val">Max Mustermann</div></div>
+      <div class="acc-row"><div class="acc-row-label">Abteilung:</div><div class="acc-row-val">ZVM-03</div></div>
+    </div>
+
+    <div class="acc-box">
+      <div class="acc-box-h"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M15.5 9.2a4 4 0 1 0 0 5.6"/><line x1="7" y1="11" x2="13.5" y2="11"/><line x1="7" y1="13.5" x2="12.5" y2="13.5"/></svg>Bestell-Limit über Kostenstelle <span class="acc-box-sub">(300 € pro Quartal)</span></div>
+      <div class="acc-limit-bar">
+        <div class="acc-limit-fill" style="width:73.33%;"></div>
+        <div class="acc-limit-tip" style="left:73.33%;">220 €</div>
+      </div>
+      <div class="acc-limit-ends"><span>0 €</span><span>300 €</span></div>
+    </div>
+
+    <div class="acc-box">
+      <div class="acc-box-h"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><line x1="12" y1="7" x2="12" y2="12"/><line x1="12" y1="12" x2="16" y2="14"/></svg>Bestellhistorie</div>
+      <div id="account-orders"></div>
+    </div>
+  </div>
+  <div class="footer-slot"></div>
+</div><!-- /account -->
 
 
 <!-- ══════════════════════════
@@ -789,7 +917,7 @@
       </nav>
       <div class="hdr-btns">
         <button class="btn-hdr" onclick="openCart(false)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Warenkorb</button>
-        <button class="btn-hdr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Mein Konto</button>
+        <button class="btn-hdr" onclick="navigate('account')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Mein Konto</button>
       </div>
     </div>
   </header>
@@ -884,7 +1012,7 @@
       </nav>
       <div class="hdr-btns">
         <button class="btn-hdr" onclick="openCart(false)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Warenkorb</button>
-        <button class="btn-hdr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Mein Konto</button>
+        <button class="btn-hdr" onclick="navigate('account')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Mein Konto</button>
       </div>
     </div>
   </header>
@@ -1408,17 +1536,125 @@
     const open = item.classList.toggle('open');
     headEl.querySelector('.faq-btn').textContent = open ? '–' : '+';
   }
+
+  /* ── Mein Konto: Bestellhistorie ── */
+  const ACCOUNT_ORDERS = [
+    { date: '14.06.2026', dateShort: '14.06.26',
+      addr: 'Johannes Dreyer · Vahrenwalder Str. 172 · 30449 Hannover', billing: 'Personalnummer',
+      items: [ { pid: 0, qty: 3 }, { pid: 1, qty: 1 }, { pid: 4, qty: 1, size: 'M' } ] },
+    { date: '11.06.2026', dateShort: '11.06.26',
+      addr: 'Monika Schuster · Bahnhofsplatz 12 · 30449 Hannover', billing: 'Projektstrukturplanelement',
+      items: [ { pid: 2, qty: 2 }, { pid: 5, qty: 4 } ] },
+    { date: '09.05.2026', dateShort: '09.05.26',
+      addr: 'Veronika Rathmann · Theaterstraße 2 · 30449 Hannover', billing: 'Personalnummer',
+      items: [ { pid: 3, qty: 1 }, { pid: 0, qty: 2 } ] }
+  ];
+  function renderAccountOrders() {
+    const el = document.getElementById('account-orders');
+    if (!el) return;
+    el.innerHTML = ACCOUNT_ORDERS.map((o, idx) => `
+      <div class="acc-order">
+        <div>
+          <div class="acc-order-date">Bestellung vom ${o.date}</div>
+          <div class="acc-order-lbl">Lieferadresse</div>
+          <div class="acc-order-val">${o.addr}<br>Abrechnungsart: ${o.billing}</div>
+        </div>
+        <button class="acc-order-btn" onclick="openOrder(${idx})">Bestellung öffnen</button>
+      </div>`).join('');
+  }
+
+  /* ── Bestelldetail-Offcanvas ── */
+  let currentOrder = null;
+  const TRASH_SVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>`;
+  function openOrder(idx) {
+    const o = ACCOUNT_ORDERS[idx];
+    currentOrder = { ...o, items: o.items.map(i => ({ ...i })) };
+    renderOrder();
+    document.getElementById('order-overlay').classList.add('open');
+    document.getElementById('order-panel').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeOrder() {
+    document.getElementById('order-overlay').classList.remove('open');
+    document.getElementById('order-panel').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function changeOrderQty(i, d) {
+    if (!currentOrder) return;
+    currentOrder.items[i].qty = Math.max(1, currentOrder.items[i].qty + d);
+    renderOrder();
+  }
+  function removeOrderItem(i) {
+    if (!currentOrder) return;
+    currentOrder.items.splice(i, 1);
+    renderOrder();
+  }
+  function renderOrder() {
+    const o = currentOrder;
+    const count = o.items.reduce((s, it) => s + it.qty, 0);
+    document.getElementById('order-title').innerHTML =
+      `Bestellung vom ${o.dateShort}<br><span style="font-weight:400;color:var(--g60);">(${count} Artikel)</span>`;
+    const itemsEl = document.getElementById('order-items');
+    if (!o.items.length) {
+      itemsEl.innerHTML = '<div class="cart-empty">Keine Artikel.</div>';
+    } else {
+      itemsEl.innerHTML = o.items.map((it, i) => {
+        const p = PRODUCTS[it.pid];
+        const line = (p.price * it.qty).toFixed(2).replace('.', ',');
+        const nm = p.name + (it.size ? ` (${it.size})` : '');
+        return `<div class="cart-item">
+          <div class="cart-item-img"><img src="${p.img}" alt=""></div>
+          <div class="cart-item-body">
+            <div class="cart-item-name">${nm}</div>
+            <div class="cart-item-unit">(${p.price.toFixed(2).replace('.', ',')} € / Stück)</div>
+            <div class="cart-item-qty">
+              <div class="cart-qty-ctrl">
+                <button class="cqbtn" onclick="changeOrderQty(${i},-1)">−</button>
+                <input class="cqval" value="${it.qty}" readonly>
+                <button class="cqbtn" onclick="changeOrderQty(${i},1)">+</button>
+              </div>
+              <span class="cart-item-price">${line} €</span>
+            </div>
+          </div>
+          <div class="cart-item-del" onclick="removeOrderItem(${i})">${TRASH_SVG}</div>
+        </div>`;
+      }).join('');
+    }
+    const sub = o.items.reduce((s, it) => s + PRODUCTS[it.pid].price * it.qty, 0);
+    document.getElementById('order-subtotal').textContent = sub.toFixed(2).replace('.', ',') + ' €';
+    document.getElementById('order-total').textContent = (sub + (o.items.length ? 3.90 : 0)).toFixed(2).replace('.', ',') + ' €';
+  }
+  function reorder() {
+    if (!currentOrder) return;
+    currentOrder.items.forEach(it => {
+      const ex = cart.find(c => c.id === it.pid && c.size === it.size);
+      if (ex) ex.qty += it.qty;
+      else cart.push({ id: it.pid, qty: it.qty, size: it.size });
+    });
+    closeOrder();
+    openCart(true);
+  }
+  /* Bestellung abschließen → Danke-Seite */
+  function placeOrder() {
+    navigate('thanks');
+    checkoutStep = 1;
+    [1, 2, 3].forEach(n => {
+      const s = document.getElementById('co-step' + n);
+      if (s) s.style.display = (n === 1) ? 'block' : 'none';
+    });
+    updateCheckoutUI();
+  }
   window.addEventListener('load', function() {
     const firstTab = document.querySelector('.co-dtab.sel');
     positionDeliveryCaret(firstTab);
     // FAQ-Header & -Footer aus der Startseite klonen (kein Markup-Duplikat)
     const homeHeader = document.querySelector('#screen-home .header');
     const homeFooter = document.querySelector('#screen-home .footer-wrapper');
-    const hSlot = document.getElementById('faq-header-slot');
-    const fSlot = document.getElementById('faq-footer-slot');
-    if (homeHeader && hSlot) hSlot.replaceWith(homeHeader.cloneNode(true));
-    if (homeFooter && fSlot) fSlot.replaceWith(homeFooter.cloneNode(true));
+    // Header/Footer aus der Startseite in alle Slots klonen (FAQ, Danke, Konto)
+    if (homeHeader) document.querySelectorAll('.header-slot').forEach(s => s.replaceWith(homeHeader.cloneNode(true)));
+    if (homeFooter) document.querySelectorAll('.footer-slot').forEach(s => s.replaceWith(homeFooter.cloneNode(true)));
     renderFAQ();
+    renderAccountOrders();
     setActiveNav('home');
   });
   function updateDeliveryForm(idx) {
@@ -1635,7 +1871,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
           Warenkorb
         </button>
-        <button class="btn-hdr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Mein Konto</button>
+        <button class="btn-hdr" onclick="navigate('account')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Mein Konto</button>
       </div>
     </div>
   </header>
@@ -1895,7 +2131,7 @@
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>
               Zurück
             </button>
-            <button class="btn-co">Jetzt zahlungspflichtig bestellen</button>
+            <button class="btn-co" onclick="placeOrder()">Jetzt zahlungspflichtig bestellen</button>
           </div>
         </div><!-- /co-step3 -->
       </div>
