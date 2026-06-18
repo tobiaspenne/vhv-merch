@@ -431,6 +431,20 @@
     .co-voucher input:focus { border-color: var(--orange); }
     .btn-voucher { padding: 14px 20px; border: 1.5px solid var(--orange); border-radius: 4px; background: #fff; color: var(--orange); font-size: 16px; font-weight: 500; font-family: inherit; cursor: pointer; white-space: nowrap; }
     .btn-voucher:hover { background: #fff5f0; }
+    /* Gutschein-Toggle (statt Checkbox) */
+    .co-toggle-row { display: flex; align-items: center; gap: 12px; margin-top: 8px; font-size: 16px; line-height: 22px; color: #405164; cursor: pointer; user-select: none; }
+    .co-toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+    .co-toggle input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+    .co-toggle-track { position: absolute; inset: 0; border-radius: 999px; background: #fff; border: 2px solid var(--g20); transition: background .15s, border-color .15s; }
+    .co-toggle-track::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #9FA8B2; transition: transform .15s, background .15s; }
+    .co-toggle input:checked + .co-toggle-track { background: var(--orange); border-color: var(--orange); }
+    .co-toggle input:checked + .co-toggle-track::after { transform: translateX(20px); background: #fff; }
+    /* Gutschein: angewendeter (inaktiver) Zustand mit Häkchen */
+    .co-voucher-field { position: relative; flex: 1; display: flex; align-items: center; }
+    .co-voucher-check { display: none; position: absolute; left: 14px; pointer-events: none; }
+    .co-voucher.applied .co-voucher-field input { background: #F5F6F7; border-color: var(--g20); color: #9FA8B2; padding-left: 42px; cursor: default; }
+    .co-voucher.applied .co-voucher-field input:focus { border-color: var(--g20); }
+    .co-voucher.applied .co-voucher-check { display: block; }
     /* Abholung Info-Box */
     .co-pickup-box { border: 1px solid var(--green); border-radius: 0; padding: 24px; background: #FBFCF3; display: flex; flex-direction: row; align-items: flex-start; gap: 16px; margin-bottom: 32px; }
     .co-pickup-box svg { flex-shrink: 0; margin-top: 2px; }
@@ -1341,8 +1355,35 @@
   }
   function toggleVoucher(cb, id) {
     const row = document.getElementById(id);
-    if (cb.checked) row.classList.add('visible');
-    else row.classList.remove('visible');
+    if (cb.checked) {
+      row.classList.add('visible');
+    } else {
+      row.classList.remove('visible');
+      resetVoucher(row);
+    }
+  }
+  function resetVoucher(row) {
+    row.classList.remove('applied');
+    const input = row.querySelector('input');
+    input.value = '';
+    input.removeAttribute('readonly');
+    const btn = row.querySelector('.btn-voucher');
+    if (btn) btn.textContent = 'Anwenden';
+  }
+  function applyVoucher(btn) {
+    const row = btn.closest('.co-voucher');
+    const input = row.querySelector('input');
+    if (row.classList.contains('applied')) {
+      // "Löschen": Code zurücksetzen, zurück in den Eingabe-Zustand
+      resetVoucher(row);
+      input.focus();
+    } else {
+      // "Anwenden": Feld inaktiv schalten + Häkchen anzeigen
+      if (!input.value.trim()) input.value = 'ABC-000-1234-XY-0';
+      input.setAttribute('readonly', 'readonly');
+      row.classList.add('applied');
+      btn.textContent = 'Löschen';
+    }
   }
   /* ── Checkout navigation ── */
   function goToCheckout() {
@@ -1642,28 +1683,46 @@
               <div id="co-pay-0">
                 <div class="co-lbl" style="font-size:16px;font-weight:500;margin-bottom:16px;">Kostenstelle</div>
                 <input class="co-fld-inp" type="text" placeholder="z.B. NW-847-00896-1">
-                <label class="co-check" style="margin-top:8px;"><input type="checkbox" onchange="toggleVoucher(this, 'voucher-0')">Geschenkgutschein-Code anwenden</label>
+                <label class="co-toggle-row" style="margin-top:8px;">
+                  <span class="co-toggle"><input type="checkbox" onchange="toggleVoucher(this, 'voucher-0')"><span class="co-toggle-track"></span></span>
+                  Geschenkgutschein-Code anwenden
+                </label>
                 <div id="voucher-0" class="co-voucher">
-                  <input type="text" placeholder="XXXX-XXX-XXX-XXXXX-X">
-                  <button class="btn-voucher">Anwenden</button>
+                  <div class="co-voucher-field">
+                    <svg class="co-voucher-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    <input type="text" placeholder="XXXX-XXX-XXX-XXXXX-X">
+                  </div>
+                  <button class="btn-voucher" onclick="applyVoucher(this)">Anwenden</button>
                 </div>
               </div>
               <div id="co-pay-1" style="display:none">
                 <div class="co-lbl" style="font-size:16px;font-weight:500;margin-bottom:16px;">Projektstrukturplanelement</div>
                 <input class="co-fld-inp" type="text" placeholder="z.B. PSP-2024-001">
-                <label class="co-check" style="margin-top:8px;"><input type="checkbox" onchange="toggleVoucher(this, 'voucher-1')">Geschenkgutschein-Code anwenden</label>
+                <label class="co-toggle-row" style="margin-top:8px;">
+                  <span class="co-toggle"><input type="checkbox" onchange="toggleVoucher(this, 'voucher-1')"><span class="co-toggle-track"></span></span>
+                  Geschenkgutschein-Code anwenden
+                </label>
                 <div id="voucher-1" class="co-voucher">
-                  <input type="text" placeholder="XXXX-XXX-XXX-XXXXX-X">
-                  <button class="btn-voucher">Anwenden</button>
+                  <div class="co-voucher-field">
+                    <svg class="co-voucher-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    <input type="text" placeholder="XXXX-XXX-XXX-XXXXX-X">
+                  </div>
+                  <button class="btn-voucher" onclick="applyVoucher(this)">Anwenden</button>
                 </div>
               </div>
               <div id="co-pay-2" style="display:none">
                 <div class="co-lbl" style="font-size:16px;font-weight:500;margin-bottom:16px;">Personalnummer</div>
                 <input class="co-fld-inp" type="text" placeholder="z.B. 12345678">
-                <label class="co-check" style="margin-top:8px;"><input type="checkbox" onchange="toggleVoucher(this, 'voucher-2')">Geschenkgutschein-Code anwenden</label>
+                <label class="co-toggle-row" style="margin-top:8px;">
+                  <span class="co-toggle"><input type="checkbox" onchange="toggleVoucher(this, 'voucher-2')"><span class="co-toggle-track"></span></span>
+                  Geschenkgutschein-Code anwenden
+                </label>
                 <div id="voucher-2" class="co-voucher">
-                  <input type="text" placeholder="XXXX-XXX-XXX-XXXXX-X">
-                  <button class="btn-voucher">Anwenden</button>
+                  <div class="co-voucher-field">
+                    <svg class="co-voucher-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    <input type="text" placeholder="XXXX-XXX-XXX-XXXXX-X">
+                  </div>
+                  <button class="btn-voucher" onclick="applyVoucher(this)">Anwenden</button>
                 </div>
               </div>
             </div><!-- /co-dform-wrap -->
