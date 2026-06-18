@@ -401,8 +401,8 @@
     /* Step 3: Bestellübersicht */
     .co3-item { display: flex; gap: 20px; align-items: flex-start; padding: 20px 0; border-bottom: 1px solid var(--g20); }
     .co3-item:last-child { border-bottom: none; }
-    .co3-thumb { width: 96px; height: 96px; background: var(--gbg); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border-radius: 2px; }
-    .co3-thumb img { width: 70%; height: 70%; object-fit: contain; }
+    .co3-thumb { width: 112px; height: 112px; padding: 20px; background: var(--gbg); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border-radius: 2px; }
+    .co3-thumb img { width: 100%; height: 100%; object-fit: contain; }
     .co3-info { flex: 1; }
     .co3-name { font-size: 16px; font-weight: 500; line-height: 22px; color: #405164; }
     .co3-unit { font-size: 16px; line-height: 24px; color: #9FA8B2; margin-top: 4px; }
@@ -410,8 +410,8 @@
     .co3-price { font-size: 16px; font-weight: 500; color: #405164; white-space: nowrap; }
     .co3-address-box { background: var(--gbg); border: none; border-radius: 4px; padding: 24px 24px 56px; display: flex; gap: 0; margin-top: 20px; position: relative; }
     .co3-addr-col { flex: 1; padding-right: 32px; }
-    .co3-icon { color: var(--orange); margin-bottom: 12px; display: block; }
-    .co3-addr-lbl { font-size: 16px; font-weight: 500; color: #405164; margin-bottom: 8px; }
+    .co3-icon { color: var(--orange); margin-bottom: 20px; display: block; }
+    .co3-addr-lbl { font-size: 16px; font-weight: 500; color: #405164; margin-bottom: 16px; }
     .co3-addr-val { font-size: 16px; line-height: 24px; color: #697481; }
     .co3-edit { position: absolute; bottom: 20px; right: 24px; color: var(--orange); font-size: 16px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; background: none; border: none; font-family: inherit; }
 
@@ -1082,9 +1082,11 @@
 
   function addToCartFromPDP() {
     const qty = Math.max(1, parseInt(document.getElementById('qty').value) || 1);
+    const sizeSel = document.getElementById('pdp-size');
+    const size = (sizeSel && sizeSel.classList.contains('selected') && sizeSel.value) ? sizeSel.value : null;
     const existing = cart.find(i => i.id === _currentPDP);
-    if (existing) existing.qty += qty;
-    else cart.push({ id: _currentPDP, qty });
+    if (existing) { existing.qty += qty; if (size) existing.size = size; }
+    else cart.push({ id: _currentPDP, qty, size });
     openCart(true);
   }
 
@@ -1273,7 +1275,7 @@
       return `<div class="co3-item">
         <div class="co3-thumb"><img src="${p.img}" alt="${p.name}"></div>
         <div class="co3-info">
-          <div class="co3-name">${p.name}</div>
+          <div class="co3-name">${p.name}${item.size ? ' (Größe ' + item.size + ')' : ''}</div>
           <div class="co3-unit">(${p.price.toFixed(2).replace('.',',')} € / Stück)</div>
           <div class="co3-qty">Menge: ${item.qty}</div>
         </div>
@@ -1803,7 +1805,7 @@
           <div class="co-sum-h">Zusammenfassung</div>
           <div class="co-row"><span>Zwischensumme</span><span id="co-subtotal">–</span></div>
           <div class="co-row"><span>Versandkosten</span><span>3,90 €</span></div>
-          <div class="co-row" id="co-voucher-row" style="display:none; color: var(--green); font-weight: 500;"><span>Geschenkgutschein angewendet</span><span>– 25,00 €</span></div>
+          <div class="co-row" id="co-voucher-row" style="display:none;"><span>Geschenkgutschein angewendet</span><span>– 25,00 €</span></div>
           <hr class="co-div">
           <div class="co-row co-total"><span>Gesamtsumme</span><span id="co-total">–</span></div>
           <div class="co-mwst" id="co-mwst"></div>
