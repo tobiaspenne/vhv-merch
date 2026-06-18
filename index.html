@@ -51,6 +51,14 @@
     .logo { cursor: pointer; display: inline-flex; align-items: center; }
     .logo img { height: 32px; width: auto; display: block; }
     .hdr-btns { display: flex; gap: 12px; }
+    /* Hauptnavigation: mittig zwischen Logo und Meta-Buttons */
+    .main-nav { display: flex; gap: 40px; align-items: center; }
+    .main-nav a { font-size: 18px; font-weight: 500; color: var(--gtxt); cursor: pointer; text-decoration: none; padding: 6px 0; border-bottom: 2px solid transparent; white-space: nowrap; transition: color .15s; }
+    .main-nav a:hover { color: var(--orange); }
+    .main-nav a.active { color: var(--orange); border-bottom-color: var(--orange); }
+    /* Auf dem grünen Hero dunkler Text */
+    #screen-home .main-nav a { color: var(--navy); }
+    #screen-home .main-nav a:hover, #screen-home .main-nav a.active { color: var(--orange); }
     .btn-hdr {
       display: inline-flex; align-items: center; gap: 8px;
       padding: 12px 16px; background: var(--orange); color: #fff;
@@ -176,9 +184,16 @@
     .faq-s  { font-size: 24px; line-height: 32px; color: var(--gtxt); }
     .btn-faq { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 12px 16px; background: var(--orange); color: #fff; font-size: 16px; font-weight: 500; border-radius: 4px; align-self: flex-start; }
     .faq-r    { flex: 1; display: flex; flex-direction: column; gap: 24px; } /* 880px */
-    .faq-item { background: var(--gbg); padding: 24px; display: flex; align-items: center; gap: 48px; }
+    .faq-item { background: var(--gbg); }
+    .faq-head { padding: 24px; display: flex; align-items: center; gap: 48px; cursor: pointer; }
     .faq-q    { font-size: 20px; font-weight: 500; line-height: 1.6; flex: 1; }
-    .faq-btn  { width: 32px; height: 32px; border-radius: 50%; background: var(--orange); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .faq-btn  { width: 32px; height: 32px; border-radius: 50%; background: var(--orange); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 22px; line-height: 1; flex-shrink: 0; user-select: none; }
+    .faq-a    { max-height: 0; overflow: hidden; transition: max-height .3s ease; padding: 0 24px; font-size: 16px; line-height: 26px; color: var(--gtxt); }
+    .faq-item.open .faq-a { max-height: 500px; padding-bottom: 24px; }
+    .faq-group { margin-bottom: 56px; }
+    .faq-group:last-child { margin-bottom: 0; }
+    .faq-cat-h { font-size: 22px; font-weight: 500; line-height: 1.4; color: var(--navy); }
+    .faq-cat-s { font-size: 16px; line-height: 24px; color: var(--gtxt); margin-top: 12px; }
 
     /* ── BADGE FARBEN ── */
     .cbadge-green { background: #B7BF00; color: #fff; border: none; }
@@ -387,8 +402,8 @@
     /* "Ihre Bestellung" + "Zusammenfassung" = Überschriften 18px/medium */
     .co-box-h { font-size: 18px; font-weight: 500; line-height: 26px; color: #405164; margin-bottom: 16px; }
     .co-thumbs { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-    .co-thumb { width: 64px; height: 64px; background: #fff; border-radius: 2px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .co-thumb img { width: 70%; height: 70%; object-fit: contain; }
+    .co-thumb { width: 84px; height: 84px; padding: 14px; background: #fff; border-radius: 2px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .co-thumb img { width: 100%; height: 100%; object-fit: contain; }
     .co-more { font-size: 14px; font-weight: 500; color: #405164; }
     .co-show { color: var(--orange); font-size: 16px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 20px; background: none; border: none; font-family: inherit; }
     .co-div { border: none; border-top: 1px solid #DADCE0; margin: 12px 0; }
@@ -596,6 +611,11 @@
   <header class="header">
     <div class="hdr-inner">
       <div class="logo" onclick="navigate('home')"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTg2IiBoZWlnaHQ9IjI2IiB2aWV3Qm94PSIwIDAgMTg2IDI2IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik03MS4zNDM3IDBDNjMuNjM3IDAgNjIuMDI1IDQuNTU3NzUgNjIuMDI1IDEyLjc5NDdDNjIuMDI1IDIwLjkzMzggNjIuNjIxOCAyNS41NTk5IDY5LjI0NjIgMjUuNTU5OUM3MS40NTI4IDI1LjU1OTkgNzMuNzYyNCAyNS4wMTE1IDc0LjYzOTcgMjIuOTA2Nkg3NC43Mjk2TDc0Ljg0OTUgMjUuMDg4Mkg3OS4yODQxVjExLjcwMzlINzAuODY0M1YxNi4wNjcxSDczLjE3MTVDNzMuMTM3OSAyMC4zNzcxIDcyLjM0ODEgMjEuMjI2MyA3MC45ODQxIDIxLjIyNjJDNjguOTg4NSAyMS4yMjYyIDY4Ljc2NjggMTkuNDQ4IDY4Ljc2NjggMTIuNzk0N0M2OC43NjY4IDYuMTM3OTEgNjguOTY3IDQuMzMzNzEgNzEuMTA0IDQuMzMzNjhDNzEuODc0NyA0LjMzMzY4IDcyLjM2MjUgNC43MDc0OSA3Mi42MDIyIDUuMzk0OTlDNzIuODUwMyA2LjA0ODI5IDcyLjk2MTcgNy4wMTUyNiA3Mi45NjE3IDguMjU0NTlINzkuMjg0MUM3OS4yODQxIDIuMjkzNjEgNzUuOTY4OSAwIDcxLjM0MzcgMFpNMCAwLjQ3MTY5M0w1LjQyMzQ0IDI1LjA4ODJIMTMuODEzM0wxOS4yMDY4IDAuNDcxNjkzSDEyLjI4NTFMOS42NDgzMyAxOS4wMTUxSDkuNTg4NEw2Ljk1MTU5IDAuNDcxNjkzSDBaTTE5Ljc0NjEgMC40NzE2OTNWMjUuMDg4MkgyNi4yNDgyVjE0Ljk0NjhIMzAuMjYzNFYyNS4wODgySDM2Ljc2NTVWMC40NzE2OTNIMzAuMjYzNFY5LjQ5Mjg4SDI2LjI0ODJWMC40NzE2OTNIMTkuNzQ2MVpNMzcuMzA0OSAwLjQ3MTY5M0w0Mi42OTgzIDI1LjA4ODJINTEuMTE4Mkw1Ni41MTE2IDAuNDcxNjkzSDQ5LjU2TDQ2LjkyMzIgMTkuMDE1MUg0Ni44NjMzTDQ0LjIyNjUgMC40NzE2OTNIMzcuMzA0OVpNODEuNDExNSAwLjQ3MTY5M1YyNS4wODgySDg3Ljk0MzZWMTUuMjQxNkg4OS42NTE1QzkxLjIyMjggMTUuMjQxNiA5MS43NzkgMTUuOTUzOSA5MS43NzkgMTguNzQ5OFYyMC40MDA3QzkxLjc3OSAyMS40MzczIDkxLjc3NzggMjMuNzc2OSA5Mi40MDgyIDI1LjA4ODJIOTkuMzU5OFYyNC43MzQ0Qzk4LjkzNzkgMjQuNTMwNSA5OC43ODQ1IDI0LjI3NTggOTguNjEwNyAyMy45OTc1Qzk4LjI5NTUgMjMuNTEzOSA5OC4zMTExIDIxLjg1NDcgOTguMzExMSAyMC41Nzc3VjE4LjQ4NDVDOTguMzExMSAxNS4yMDg2IDk3LjM2MDYgMTMuMjIwNCA5NC4yMDYgMTIuOTQyMVYxMi44ODMxQzk3LjE4MzIgMTIuNDI5MSA5OC40OTA5IDEwLjI5NTkgOTguNDkwOSA3LjAxNjQ5Qzk4LjQ5MDkgMy4yMjYzOCA5Ni41NzMyIDAuNDcxNjkzIDkxLjU5OTIgMC40NzE2OTNIODEuNDExNVpNMTAwLjczOCAwLjQ3MTY5M1YxNi41OTc3QzEwMC43MzggMjMuNDkwMyAxMDMuNzQ5IDI1LjU1OTkgMTA5LjIxOCAyNS41NTk5QzExNC42ODMgMjUuNTU5OSAxMTcuNjY4IDIzLjQ5MDMgMTE3LjY2OCAxNi41OTc3VjAuNDcxNjkzSDExMS4xNjZWMTguMjE5MkMxMTEuMTY2IDIwLjYgMTEwLjQ0IDIxLjIyNjMgMTA5LjIxOCAyMS4yMjYyQzEwNy45OTEgMjEuMjI2MiAxMDcuMjQgMjAuNiAxMDcuMjQgMTguMjE5MlYwLjQ3MTY5M0gxMDAuNzM4Wk0xMTkuNzA1IDAuNDcxNjkzVjI1LjA4ODJIMTI2LjIzN1YxNS43MTMzSDEyOC41MTVDMTMzLjgwNiAxNS43MTMzIDEzNi43MjUgMTMuMDg2IDEzNi43MjUgOC4wNDgyN0MxMzYuNzI1IDMuNzQ1MjUgMTM0LjQ4IDAuNDcxNjkzIDEyOS41MDMgMC40NzE2OTNIMTE5LjcwNVpNMTM4LjAxMyAwLjQ3MTY5M1YyNS4wODgySDE0NC41MTVWMTUuNzEzM0gxNDYuNzkyQzE1Mi4wODQgMTUuNzEzMyAxNTUuMDAyIDEzLjA4NiAxNTUuMDAyIDguMDQ4MjdDMTU1LjAwMiAzLjc0NTI1IDE1Mi43NTkgMC40NzE2OTMgMTQ3Ljc4MSAwLjQ3MTY5M0gxMzguMDEzWk0xNTYuNTMxIDAuNDcxNjkzVjI1LjA4ODJIMTcxLjY5MlYxOS44NDA2SDE2My4wNjNWMTQuOTQ2OEgxNzAuODUzVjkuOTM1MDRIMTYzLjA2M1Y1LjcxOTI4SDE3MS4zNjNWMC40NzE2OTNIMTU2LjUzMVpNODcuOTQzNiA1LjEwMDE5SDg5LjIwMjFDOTEuMTYyOSA1LjEwMDE5IDkxLjk1ODggNS45NjMzNiA5MS45NTg4IDcuOTU5ODhDOTEuOTU4OCA5LjcxNTcxIDkxLjA5MSAxMC44Nzg0IDg5LjIzMjEgMTAuODc4NEg4Ny45NDM2VjUuMTAwMTlaTTEyNi4yMzcgNS4xMDAxOUgxMjcuNDY2QzEyOS4xMTQgNS4xMDAxOSAxMjkuOTgzIDYuMDQ3MTMgMTI5Ljk4MyA4LjA3NzhDMTI5Ljk4MyAxMC4xNDk3IDEyOS4xMTQgMTEuMDg0OCAxMjcuNDY2IDExLjA4NDhIMTI2LjIzN1Y1LjEwMDE5Wk0xNDQuNTE1IDUuMTAwMTlIMTQ1Ljc0NEMxNDcuMzg4IDUuMTAwMTkgMTQ4LjI2MSA2LjA0NzEzIDE0OC4yNjEgOC4wNzc4QzE0OC4yNjEgMTAuMTQ5NyAxNDcuMzg4IDExLjA4NDggMTQ1Ljc0NCAxMS4wODQ4SDE0NC41MTVWNS4xMDAxOVoiIGZpbGw9IiM0MDUxNjQiLz48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTE3NC43MDQgMjUuNTU5OUgxODAuMjgzTDE4NiAwSDE4MC40MjJMMTc0LjcwNCAyNS41NTk5WiIgZmlsbD0iIzk5QTMxOSIvPjwvc3ZnPg==" alt="VHV Gruppe"></div>
+      <nav class="main-nav">
+        <a data-nav="home" onclick="navigate('home')">Startseite</a>
+        <a data-nav="plp" onclick="navigate('plp')">Alle Produkte</a>
+        <a data-nav="faq" onclick="navigate('faq')">FAQ</a>
+      </nav>
       <div class="hdr-btns">
         <button class="btn-hdr" onclick="openCart(false)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Warenkorb</button>
         <button class="btn-hdr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Mein Konto</button>
@@ -703,15 +723,9 @@
     <div class="faq-l">
       <h2 class="faq-h">Unsere FAQs</h2>
       <p class="faq-s">Lorem ipsum dolor sit amet, consetetur sadipscing elit.</p>
-      <button class="btn-faq">Alle FAQs ansehen →</button>
+      <button class="btn-faq" onclick="navigate('faq')">Alle FAQs ansehen →</button>
     </div>
-    <div class="faq-r">
-      <div class="faq-item"><span class="faq-q">Nullam quis risus eget urna mollis ornare vel eu leo?</span><span class="faq-btn">+</span></div>
-      <div class="faq-item"><span class="faq-q">Sed possuere consectetur est at lobortis?</span><span class="faq-btn">+</span></div>
-      <div class="faq-item"><span class="faq-q">Cum sociis natoque penatibus et magnis dis parturient?</span><span class="faq-btn">+</span></div>
-      <div class="faq-item"><span class="faq-q">Maecenas faucibus mollis interdum?</span><span class="faq-btn">+</span></div>
-      <div class="faq-item"><span class="faq-q">Nullam quis risus eget urna mollis ornare vel eu leo?</span><span class="faq-btn">+</span></div>
-    </div>
+    <div class="faq-r" id="home-faq-list"></div>
    </div>
   </div>
 
@@ -746,12 +760,33 @@
 
 
 <!-- ══════════════════════════
+  FAQ-SEITE
+══════════════════════════ -->
+<div id="screen-faq" class="screen">
+  <div id="faq-header-slot"></div>
+  <div style="padding:48px 0 120px;">
+    <div class="cnt" style="margin-bottom:56px;">
+      <h1 class="faq-h" style="font-size:48px;">Unsere FAQ</h1>
+      <p class="faq-s" style="margin-top:16px; max-width:600px;">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor.</p>
+    </div>
+    <div id="faq-groups"></div>
+  </div>
+  <div id="faq-footer-slot"></div>
+</div><!-- /faq -->
+
+
+<!-- ══════════════════════════
   PLP
 ══════════════════════════ -->
 <div id="screen-plp" class="screen">
   <header class="header">
     <div class="hdr-inner">
       <div class="logo" onclick="navigate('home')"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTg2IiBoZWlnaHQ9IjI2IiB2aWV3Qm94PSIwIDAgMTg2IDI2IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik03MS4zNDM3IDBDNjMuNjM3IDAgNjIuMDI1IDQuNTU3NzUgNjIuMDI1IDEyLjc5NDdDNjIuMDI1IDIwLjkzMzggNjIuNjIxOCAyNS41NTk5IDY5LjI0NjIgMjUuNTU5OUM3MS40NTI4IDI1LjU1OTkgNzMuNzYyNCAyNS4wMTE1IDc0LjYzOTcgMjIuOTA2Nkg3NC43Mjk2TDc0Ljg0OTUgMjUuMDg4Mkg3OS4yODQxVjExLjcwMzlINzAuODY0M1YxNi4wNjcxSDczLjE3MTVDNzMuMTM3OSAyMC4zNzcxIDcyLjM0ODEgMjEuMjI2MyA3MC45ODQxIDIxLjIyNjJDNjguOTg4NSAyMS4yMjYyIDY4Ljc2NjggMTkuNDQ4IDY4Ljc2NjggMTIuNzk0N0M2OC43NjY4IDYuMTM3OTEgNjguOTY3IDQuMzMzNzEgNzEuMTA0IDQuMzMzNjhDNzEuODc0NyA0LjMzMzY4IDcyLjM2MjUgNC43MDc0OSA3Mi42MDIyIDUuMzk0OTlDNzIuODUwMyA2LjA0ODI5IDcyLjk2MTcgNy4wMTUyNiA3Mi45NjE3IDguMjU0NTlINzkuMjg0MUM3OS4yODQxIDIuMjkzNjEgNzUuOTY4OSAwIDcxLjM0MzcgMFpNMCAwLjQ3MTY5M0w1LjQyMzQ0IDI1LjA4ODJIMTMuODEzM0wxOS4yMDY4IDAuNDcxNjkzSDEyLjI4NTFMOS42NDgzMyAxOS4wMTUxSDkuNTg4NEw2Ljk1MTU5IDAuNDcxNjkzSDBaTTE5Ljc0NjEgMC40NzE2OTNWMjUuMDg4MkgyNi4yNDgyVjE0Ljk0NjhIMzAuMjYzNFYyNS4wODgySDM2Ljc2NTVWMC40NzE2OTNIMzAuMjYzNFY5LjQ5Mjg4SDI2LjI0ODJWMC40NzE2OTNIMTkuNzQ2MVpNMzcuMzA0OSAwLjQ3MTY5M0w0Mi42OTgzIDI1LjA4ODJINTEuMTE4Mkw1Ni41MTE2IDAuNDcxNjkzSDQ5LjU2TDQ2LjkyMzIgMTkuMDE1MUg0Ni44NjMzTDQ0LjIyNjUgMC40NzE2OTNIMzcuMzA0OVpNODEuNDExNSAwLjQ3MTY5M1YyNS4wODgySDg3Ljk0MzZWMTUuMjQxNkg4OS42NTE1QzkxLjIyMjggMTUuMjQxNiA5MS43NzkgMTUuOTUzOSA5MS43NzkgMTguNzQ5OFYyMC40MDA3QzkxLjc3OSAyMS40MzczIDkxLjc3NzggMjMuNzc2OSA5Mi40MDgyIDI1LjA4ODJIOTkuMzU5OFYyNC43MzQ0Qzk4LjkzNzkgMjQuNTMwNSA5OC43ODQ1IDI0LjI3NTggOTguNjEwNyAyMy45OTc1Qzk4LjI5NTUgMjMuNTEzOSA5OC4zMTExIDIxLjg1NDcgOTguMzExMSAyMC41Nzc3VjE4LjQ4NDVDOTguMzExMSAxNS4yMDg2IDk3LjM2MDYgMTMuMjIwNCA5NC4yMDYgMTIuOTQyMVYxMi44ODMxQzk3LjE4MzIgMTIuNDI5MSA5OC40OTA5IDEwLjI5NTkgOTguNDkwOSA3LjAxNjQ5Qzk4LjQ5MDkgMy4yMjYzOCA5Ni41NzMyIDAuNDcxNjkzIDkxLjU5OTIgMC40NzE2OTNIODEuNDExNVpNMTAwLjczOCAwLjQ3MTY5M1YxNi41OTc3QzEwMC43MzggMjMuNDkwMyAxMDMuNzQ5IDI1LjU1OTkgMTA5LjIxOCAyNS41NTk5QzExNC42ODMgMjUuNTU5OSAxMTcuNjY4IDIzLjQ5MDMgMTE3LjY2OCAxNi41OTc3VjAuNDcxNjkzSDExMS4xNjZWMTguMjE5MkMxMTEuMTY2IDIwLjYgMTEwLjQ0IDIxLjIyNjMgMTA5LjIxOCAyMS4yMjYyQzEwNy45OTEgMjEuMjI2MiAxMDcuMjQgMjAuNiAxMDcuMjQgMTguMjE5MlYwLjQ3MTY5M0gxMDAuNzM4Wk0xMTkuNzA1IDAuNDcxNjkzVjI1LjA4ODJIMTI2LjIzN1YxNS43MTMzSDEyOC41MTVDMTMzLjgwNiAxNS43MTMzIDEzNi43MjUgMTMuMDg2IDEzNi43MjUgOC4wNDgyN0MxMzYuNzI1IDMuNzQ1MjUgMTM0LjQ4IDAuNDcxNjkzIDEyOS41MDMgMC40NzE2OTNIMTE5LjcwNVpNMTM4LjAxMyAwLjQ3MTY5M1YyNS4wODgySDE0NC41MTVWMTUuNzEzM0gxNDYuNzkyQzE1Mi4wODQgMTUuNzEzMyAxNTUuMDAyIDEzLjA4NiAxNTUuMDAyIDguMDQ4MjdDMTU1LjAwMiAzLjc0NTI1IDE1Mi43NTkgMC40NzE2OTMgMTQ3Ljc4MSAwLjQ3MTY5M0gxMzguMDEzWk0xNTYuNTMxIDAuNDcxNjkzVjI1LjA4ODJIMTcxLjY5MlYxOS44NDA2SDE2My4wNjNWMTQuOTQ2OEgxNzAuODUzVjkuOTM1MDRIMTYzLjA2M1Y1LjcxOTI4SDE3MS4zNjNWMC40NzE2OTNIMTU2LjUzMVpNODcuOTQzNiA1LjEwMDE5SDg5LjIwMjFDOTEuMTYyOSA1LjEwMDE5IDkxLjk1ODggNS45NjMzNiA5MS45NTg4IDcuOTU5ODhDOTEuOTU4OCA5LjcxNTcxIDkxLjA5MSAxMC44Nzg0IDg5LjIzMjEgMTAuODc4NEg4Ny45NDM2VjUuMTAwMTlaTTEyNi4yMzcgNS4xMDAxOUgxMjcuNDY2QzEyOS4xMTQgNS4xMDAxOSAxMjkuOTgzIDYuMDQ3MTMgMTI5Ljk4MyA4LjA3NzhDMTI5Ljk4MyAxMC4xNDk3IDEyOS4xMTQgMTEuMDg0OCAxMjcuNDY2IDExLjA4NDhIMTI2LjIzN1Y1LjEwMDE5Wk0xNDQuNTE1IDUuMTAwMTlIMTQ1Ljc0NEMxNDcuMzg4IDUuMTAwMTkgMTQ4LjI2MSA2LjA0NzEzIDE0OC4yNjEgOC4wNzc4QzE0OC4yNjEgMTAuMTQ5NyAxNDcuMzg4IDExLjA4NDggMTQ1Ljc0NCAxMS4wODQ4SDE0NC41MTVWNS4xMDAxOVoiIGZpbGw9IiM0MDUxNjQiLz48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTE3NC43MDQgMjUuNTU5OUgxODAuMjgzTDE4NiAwSDE4MC40MjJMMTc0LjcwNCAyNS41NTk5WiIgZmlsbD0iIzk5QTMxOSIvPjwvc3ZnPg==" alt="VHV Gruppe"></div>
+      <nav class="main-nav">
+        <a data-nav="home" onclick="navigate('home')">Startseite</a>
+        <a data-nav="plp" onclick="navigate('plp')">Alle Produkte</a>
+        <a data-nav="faq" onclick="navigate('faq')">FAQ</a>
+      </nav>
       <div class="hdr-btns">
         <button class="btn-hdr" onclick="openCart(false)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Warenkorb</button>
         <button class="btn-hdr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Mein Konto</button>
@@ -842,6 +877,11 @@
   <header class="header">
     <div class="hdr-inner">
       <div class="logo" onclick="navigate('home')"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTg2IiBoZWlnaHQ9IjI2IiB2aWV3Qm94PSIwIDAgMTg2IDI2IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik03MS4zNDM3IDBDNjMuNjM3IDAgNjIuMDI1IDQuNTU3NzUgNjIuMDI1IDEyLjc5NDdDNjIuMDI1IDIwLjkzMzggNjIuNjIxOCAyNS41NTk5IDY5LjI0NjIgMjUuNTU5OUM3MS40NTI4IDI1LjU1OTkgNzMuNzYyNCAyNS4wMTE1IDc0LjYzOTcgMjIuOTA2Nkg3NC43Mjk2TDc0Ljg0OTUgMjUuMDg4Mkg3OS4yODQxVjExLjcwMzlINzAuODY0M1YxNi4wNjcxSDczLjE3MTVDNzMuMTM3OSAyMC4zNzcxIDcyLjM0ODEgMjEuMjI2MyA3MC45ODQxIDIxLjIyNjJDNjguOTg4NSAyMS4yMjYyIDY4Ljc2NjggMTkuNDQ4IDY4Ljc2NjggMTIuNzk0N0M2OC43NjY4IDYuMTM3OTEgNjguOTY3IDQuMzMzNzEgNzEuMTA0IDQuMzMzNjhDNzEuODc0NyA0LjMzMzY4IDcyLjM2MjUgNC43MDc0OSA3Mi42MDIyIDUuMzk0OTlDNzIuODUwMyA2LjA0ODI5IDcyLjk2MTcgNy4wMTUyNiA3Mi45NjE3IDguMjU0NTlINzkuMjg0MUM3OS4yODQxIDIuMjkzNjEgNzUuOTY4OSAwIDcxLjM0MzcgMFpNMCAwLjQ3MTY5M0w1LjQyMzQ0IDI1LjA4ODJIMTMuODEzM0wxOS4yMDY4IDAuNDcxNjkzSDEyLjI4NTFMOS42NDgzMyAxOS4wMTUxSDkuNTg4NEw2Ljk1MTU5IDAuNDcxNjkzSDBaTTE5Ljc0NjEgMC40NzE2OTNWMjUuMDg4MkgyNi4yNDgyVjE0Ljk0NjhIMzAuMjYzNFYyNS4wODgySDM2Ljc2NTVWMC40NzE2OTNIMzAuMjYzNFY5LjQ5Mjg4SDI2LjI0ODJWMC40NzE2OTNIMTkuNzQ2MVpNMzcuMzA0OSAwLjQ3MTY5M0w0Mi42OTgzIDI1LjA4ODJINTEuMTE4Mkw1Ni41MTE2IDAuNDcxNjkzSDQ5LjU2TDQ2LjkyMzIgMTkuMDE1MUg0Ni44NjMzTDQ0LjIyNjUgMC40NzE2OTNIMzcuMzA0OVpNODEuNDExNSAwLjQ3MTY5M1YyNS4wODgySDg3Ljk0MzZWMTUuMjQxNkg4OS42NTE1QzkxLjIyMjggMTUuMjQxNiA5MS43NzkgMTUuOTUzOSA5MS43NzkgMTguNzQ5OFYyMC40MDA3QzkxLjc3OSAyMS40MzczIDkxLjc3NzggMjMuNzc2OSA5Mi40MDgyIDI1LjA4ODJIOTkuMzU5OFYyNC43MzQ0Qzk4LjkzNzkgMjQuNTMwNSA5OC43ODQ1IDI0LjI3NTggOTguNjEwNyAyMy45OTc1Qzk4LjI5NTUgMjMuNTEzOSA5OC4zMTExIDIxLjg1NDcgOTguMzExMSAyMC41Nzc3VjE4LjQ4NDVDOTguMzExMSAxNS4yMDg2IDk3LjM2MDYgMTMuMjIwNCA5NC4yMDYgMTIuOTQyMVYxMi44ODMxQzk3LjE4MzIgMTIuNDI5MSA5OC40OTA5IDEwLjI5NTkgOTguNDkwOSA3LjAxNjQ5Qzk4LjQ5MDkgMy4yMjYzOCA5Ni41NzMyIDAuNDcxNjkzIDkxLjU5OTIgMC40NzE2OTNIODEuNDExNVpNMTAwLjczOCAwLjQ3MTY5M1YxNi41OTc3QzEwMC43MzggMjMuNDkwMyAxMDMuNzQ5IDI1LjU1OTkgMTA5LjIxOCAyNS41NTk5QzExNC42ODMgMjUuNTU5OSAxMTcuNjY4IDIzLjQ5MDMgMTE3LjY2OCAxNi41OTc3VjAuNDcxNjkzSDExMS4xNjZWMTguMjE5MkMxMTEuMTY2IDIwLjYgMTEwLjQ0IDIxLjIyNjMgMTA5LjIxOCAyMS4yMjYyQzEwNy45OTEgMjEuMjI2MiAxMDcuMjQgMjAuNiAxMDcuMjQgMTguMjE5MlYwLjQ3MTY5M0gxMDAuNzM4Wk0xMTkuNzA1IDAuNDcxNjkzVjI1LjA4ODJIMTI2LjIzN1YxNS43MTMzSDEyOC41MTVDMTMzLjgwNiAxNS43MTMzIDEzNi43MjUgMTMuMDg2IDEzNi43MjUgOC4wNDgyN0MxMzYuNzI1IDMuNzQ1MjUgMTM0LjQ4IDAuNDcxNjkzIDEyOS41MDMgMC40NzE2OTNIMTE5LjcwNVpNMTM4LjAxMyAwLjQ3MTY5M1YyNS4wODgySDE0NC41MTVWMTUuNzEzM0gxNDYuNzkyQzE1Mi4wODQgMTUuNzEzMyAxNTUuMDAyIDEzLjA4NiAxNTUuMDAyIDguMDQ4MjdDMTU1LjAwMiAzLjc0NTI1IDE1Mi43NTkgMC40NzE2OTMgMTQ3Ljc4MSAwLjQ3MTY5M0gxMzguMDEzWk0xNTYuNTMxIDAuNDcxNjkzVjI1LjA4ODJIMTcxLjY5MlYxOS44NDA2SDE2My4wNjNWMTQuOTQ2OEgxNzAuODUzVjkuOTM1MDRIMTYzLjA2M1Y1LjcxOTI4SDE3MS4zNjNWMC40NzE2OTNIMTU2LjUzMVpNODcuOTQzNiA1LjEwMDE5SDg5LjIwMjFDOTEuMTYyOSA1LjEwMDE5IDkxLjk1ODggNS45NjMzNiA5MS45NTg4IDcuOTU5ODhDOTEuOTU4OCA5LjcxNTcxIDkxLjA5MSAxMC44Nzg0IDg5LjIzMjEgMTAuODc4NEg4Ny45NDM2VjUuMTAwMTlaTTEyNi4yMzcgNS4xMDAxOUgxMjcuNDY2QzEyOS4xMTQgNS4xMDAxOSAxMjkuOTgzIDYuMDQ3MTMgMTI5Ljk4MyA4LjA3NzhDMTI5Ljk4MyAxMC4xNDk3IDEyOS4xMTQgMTEuMDg0OCAxMjcuNDY2IDExLjA4NDhIMTI2LjIzN1Y1LjEwMDE5Wk0xNDQuNTE1IDUuMTAwMTlIMTQ1Ljc0NEMxNDcuMzg4IDUuMTAwMTkgMTQ4LjI2MSA2LjA0NzEzIDE0OC4yNjEgOC4wNzc4QzE0OC4yNjEgMTAuMTQ5NyAxNDcuMzg4IDExLjA4NDggMTQ1Ljc0NCAxMS4wODQ4SDE0NC41MTVWNS4xMDAxOVoiIGZpbGw9IiM0MDUxNjQiLz48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTE3NC43MDQgMjUuNTU5OUgxODAuMjgzTDE4NiAwSDE4MC40MjJMMTc0LjcwNCAyNS41NTk5WiIgZmlsbD0iIzk5QTMxOSIvPjwvc3ZnPg==" alt="VHV Gruppe"></div>
+      <nav class="main-nav">
+        <a data-nav="home" onclick="navigate('home')">Startseite</a>
+        <a data-nav="plp" onclick="navigate('plp')">Alle Produkte</a>
+        <a data-nav="faq" onclick="navigate('faq')">FAQ</a>
+      </nav>
       <div class="hdr-btns">
         <button class="btn-hdr" onclick="openCart(false)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Warenkorb</button>
         <button class="btn-hdr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Mein Konto</button>
@@ -1082,8 +1122,10 @@
 
   function addToCartFromPDP() {
     const qty = Math.max(1, parseInt(document.getElementById('qty').value) || 1);
+    const prod = PRODUCTS[_currentPDP];
+    const hasSizes = prod && prod.sizes && prod.sizes.length;
     const sizeSel = document.getElementById('pdp-size');
-    const size = (sizeSel && sizeSel.classList.contains('selected') && sizeSel.value) ? sizeSel.value : null;
+    const size = (hasSizes && sizeSel && sizeSel.value) ? sizeSel.value : null;
     const existing = cart.find(i => i.id === _currentPDP);
     if (existing) { existing.qty += qty; if (size) existing.size = size; }
     else cart.push({ id: _currentPDP, qty, size });
@@ -1229,7 +1271,7 @@
   }
   const STEP_NAMES = ['Versand', 'Bezahlung', 'Bestellung abschließen'];
   const STEP_LABELS = ['1. Versand', '2. Bezahlung', '3. Bestellung abschließen'];
-  const CHECK_SVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+  const CHECK_SVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;"><polyline points="20 6 9 17 4 12"/></svg>`;
   function updateCheckoutUI() {
     const activeCount = checkoutStep;
     document.querySelectorAll('#screen-checkout .co-bar').forEach((b,i) => b.classList.toggle('active', i<activeCount));
@@ -1322,9 +1364,62 @@
     updateDeliveryForm(idx);
     positionDeliveryCaret(el);
   }
+  /* ── FAQ ── */
+  const FAQ_Q = [
+    'Nullam quis risus eget urna mollis ornare vel eu leo?',
+    'Sed possuere consectetur est at lobortis?',
+    'Cum sociis natoque penatibus et magnis dis parturient?',
+    'Maecenas faucibus mollis interdum?',
+    'Nullam quis risus eget urna mollis ornare vel eu leo?'
+  ];
+  const FAQ_A = 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.';
+  const FAQ_GROUPS = [
+    { title: 'Bestellprozess',           sub: 'Lorem ipsum dolor sit amet, consetetur sadipscing elit.' },
+    { title: 'Abrechnung & Kostenstelle', sub: 'Lorem ipsum dolor sit amet, consetetur sadipscing elit.' },
+    { title: 'Versand & Rückgabe',        sub: 'Lorem ipsum dolor sit amet, consetetur sadipscing elit.' }
+  ];
+  function faqItemsHTML() {
+    return FAQ_Q.map(q => `
+      <div class="faq-item">
+        <div class="faq-head" onclick="toggleFaq(this)">
+          <span class="faq-q">${q}</span>
+          <span class="faq-btn">+</span>
+        </div>
+        <div class="faq-a">${FAQ_A}</div>
+      </div>`).join('');
+  }
+  function renderFAQ() {
+    const groupsEl = document.getElementById('faq-groups');
+    if (groupsEl) {
+      groupsEl.innerHTML = FAQ_GROUPS.map(g => `
+        <div class="faq-group"><div class="faq-cnt">
+          <div class="faq-l">
+            <h2 class="faq-cat-h">${g.title}</h2>
+            <p class="faq-cat-s">${g.sub}</p>
+          </div>
+          <div class="faq-r">${faqItemsHTML()}</div>
+        </div></div>`).join('');
+    }
+    const homeList = document.getElementById('home-faq-list');
+    if (homeList) homeList.innerHTML = faqItemsHTML();
+  }
+  function toggleFaq(headEl) {
+    const item = headEl.closest('.faq-item');
+    const open = item.classList.toggle('open');
+    headEl.querySelector('.faq-btn').textContent = open ? '–' : '+';
+  }
   window.addEventListener('load', function() {
     const firstTab = document.querySelector('.co-dtab.sel');
     positionDeliveryCaret(firstTab);
+    // FAQ-Header & -Footer aus der Startseite klonen (kein Markup-Duplikat)
+    const homeHeader = document.querySelector('#screen-home .header');
+    const homeFooter = document.querySelector('#screen-home .footer-wrapper');
+    const hSlot = document.getElementById('faq-header-slot');
+    const fSlot = document.getElementById('faq-footer-slot');
+    if (homeHeader && hSlot) hSlot.replaceWith(homeHeader.cloneNode(true));
+    if (homeFooter && fSlot) fSlot.replaceWith(homeFooter.cloneNode(true));
+    renderFAQ();
+    setActiveNav('home');
   });
   function updateDeliveryForm(idx) {
     ['co-form-versand','co-form-hauspost','co-form-abholung'].forEach((id, i) => {
@@ -1453,6 +1548,11 @@
     document.getElementById('screen-' + id).classList.add('active');
     window.scrollTo({ top: 0, behavior: 'instant' });
     if (id === 'pdp') { document.getElementById('info-extra').classList.remove('open'); document.getElementById('mehr-link').style.removeProperty('display'); }
+    setActiveNav(id);
+  }
+  function setActiveNav(id) {
+    const key = (id === 'pdp') ? 'plp' : id; // PDP zählt zu "Alle Produkte"
+    document.querySelectorAll('.main-nav a').forEach(a => a.classList.toggle('active', a.dataset.nav === key));
   }
   const CAT_MAP = {
     'Alle Artikel':         'all',
@@ -1525,6 +1625,11 @@
   <header class="header">
     <div class="hdr-inner">
       <div class="logo" onclick="navigate('home')"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTg2IiBoZWlnaHQ9IjI2IiB2aWV3Qm94PSIwIDAgMTg2IDI2IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik03MS4zNDM3IDBDNjMuNjM3IDAgNjIuMDI1IDQuNTU3NzUgNjIuMDI1IDEyLjc5NDdDNjIuMDI1IDIwLjkzMzggNjIuNjIxOCAyNS41NTk5IDY5LjI0NjIgMjUuNTU5OUM3MS40NTI4IDI1LjU1OTkgNzMuNzYyNCAyNS4wMTE1IDc0LjYzOTcgMjIuOTA2Nkg3NC43Mjk2TDc0Ljg0OTUgMjUuMDg4Mkg3OS4yODQxVjExLjcwMzlINzAuODY0M1YxNi4wNjcxSDczLjE3MTVDNzMuMTM3OSAyMC4zNzcxIDcyLjM0ODEgMjEuMjI2MyA3MC45ODQxIDIxLjIyNjJDNjguOTg4NSAyMS4yMjYyIDY4Ljc2NjggMTkuNDQ4IDY4Ljc2NjggMTIuNzk0N0M2OC43NjY4IDYuMTM3OTEgNjguOTY3IDQuMzMzNzEgNzEuMTA0IDQuMzMzNjhDNzEuODc0NyA0LjMzMzY4IDcyLjM2MjUgNC43MDc0OSA3Mi42MDIyIDUuMzk0OTlDNzIuODUwMyA2LjA0ODI5IDcyLjk2MTcgNy4wMTUyNiA3Mi45NjE3IDguMjU0NTlINzkuMjg0MUM3OS4yODQxIDIuMjkzNjEgNzUuOTY4OSAwIDcxLjM0MzcgMFpNMCAwLjQ3MTY5M0w1LjQyMzQ0IDI1LjA4ODJIMTMuODEzM0wxOS4yMDY4IDAuNDcxNjkzSDEyLjI4NTFMOS42NDgzMyAxOS4wMTUxSDkuNTg4NEw2Ljk1MTU5IDAuNDcxNjkzSDBaTTE5Ljc0NjEgMC40NzE2OTNWMjUuMDg4MkgyNi4yNDgyVjE0Ljk0NjhIMzAuMjYzNFYyNS4wODgySDM2Ljc2NTVWMC40NzE2OTNIMzAuMjYzNFY5LjQ5Mjg4SDI2LjI0ODJWMC40NzE2OTNIMTkuNzQ2MVpNMzcuMzA0OSAwLjQ3MTY5M0w0Mi42OTgzIDI1LjA4ODJINTEuMTE4Mkw1Ni41MTE2IDAuNDcxNjkzSDQ5LjU2TDQ2LjkyMzIgMTkuMDE1MUg0Ni44NjMzTDQ0LjIyNjUgMC40NzE2OTNIMzcuMzA0OVpNODEuNDExNSAwLjQ3MTY5M1YyNS4wODgySDg3Ljk0MzZWMTUuMjQxNkg4OS42NTE1QzkxLjIyMjggMTUuMjQxNiA5MS43NzkgMTUuOTUzOSA5MS43NzkgMTguNzQ5OFYyMC40MDA3QzkxLjc3OSAyMS40MzczIDkxLjc3NzggMjMuNzc2OSA5Mi40MDgyIDI1LjA4ODJIOTkuMzU5OFYyNC43MzQ0Qzk4LjkzNzkgMjQuNTMwNSA5OC43ODQ1IDI0LjI3NTggOTguNjEwNyAyMy45OTc1Qzk4LjI5NTUgMjMuNTEzOSA5OC4zMTExIDIxLjg1NDcgOTguMzExMSAyMC41Nzc3VjE4LjQ4NDVDOTguMzExMSAxNS4yMDg2IDk3LjM2MDYgMTMuMjIwNCA5NC4yMDYgMTIuOTQyMVYxMi44ODMxQzk3LjE4MzIgMTIuNDI5MSA5OC40OTA5IDEwLjI5NTkgOTguNDkwOSA3LjAxNjQ5Qzk4LjQ5MDkgMy4yMjYzOCA5Ni41NzMyIDAuNDcxNjkzIDkxLjU5OTIgMC40NzE2OTNIODEuNDExNVpNMTAwLjczOCAwLjQ3MTY5M1YxNi41OTc3QzEwMC43MzggMjMuNDkwMyAxMDMuNzQ5IDI1LjU1OTkgMTA5LjIxOCAyNS41NTk5QzExNC42ODMgMjUuNTU5OSAxMTcuNjY4IDIzLjQ5MDMgMTE3LjY2OCAxNi41OTc3VjAuNDcxNjkzSDExMS4xNjZWMTguMjE5MkMxMTEuMTY2IDIwLjYgMTEwLjQ0IDIxLjIyNjMgMTA5LjIxOCAyMS4yMjYyQzEwNy45OTEgMjEuMjI2MiAxMDcuMjQgMjAuNiAxMDcuMjQgMTguMjE5MlYwLjQ3MTY5M0gxMDAuNzM4Wk0xMTkuNzA1IDAuNDcxNjkzVjI1LjA4ODJIMTI2LjIzN1YxNS43MTMzSDEyOC41MTVDMTMzLjgwNiAxNS43MTMzIDEzNi43MjUgMTMuMDg2IDEzNi43MjUgOC4wNDgyN0MxMzYuNzI1IDMuNzQ1MjUgMTM0LjQ4IDAuNDcxNjkzIDEyOS41MDMgMC40NzE2OTNIMTE5LjcwNVpNMTM4LjAxMyAwLjQ3MTY5M1YyNS4wODgySDE0NC41MTVWMTUuNzEzM0gxNDYuNzkyQzE1Mi4wODQgMTUuNzEzMyAxNTUuMDAyIDEzLjA4NiAxNTUuMDAyIDguMDQ4MjdDMTU1LjAwMiAzLjc0NTI1IDE1Mi43NTkgMC40NzE2OTMgMTQ3Ljc4MSAwLjQ3MTY5M0gxMzguMDEzWk0xNTYuNTMxIDAuNDcxNjkzVjI1LjA4ODJIMTcxLjY5MlYxOS44NDA2SDE2My4wNjNWMTQuOTQ2OEgxNzAuODUzVjkuOTM1MDRIMTYzLjA2M1Y1LjcxOTI4SDE3MS4zNjNWMC40NzE2OTNIMTU2LjUzMVpNODcuOTQzNiA1LjEwMDE5SDg5LjIwMjFDOTEuMTYyOSA1LjEwMDE5IDkxLjk1ODggNS45NjMzNiA5MS45NTg4IDcuOTU5ODhDOTEuOTU4OCA5LjcxNTcxIDkxLjA5MSAxMC44Nzg0IDg5LjIzMjEgMTAuODc4NEg4Ny45NDM2VjUuMTAwMTlaTTEyNi4yMzcgNS4xMDAxOUgxMjcuNDY2QzEyOS4xMTQgNS4xMDAxOSAxMjkuOTgzIDYuMDQ3MTMgMTI5Ljk4MyA4LjA3NzhDMTI5Ljk4MyAxMC4xNDk3IDEyOS4xMTQgMTEuMDg0OCAxMjcuNDY2IDExLjA4NDhIMTI2LjIzN1Y1LjEwMDE5Wk0xNDQuNTE1IDUuMTAwMTlIMTQ1Ljc0NEMxNDcuMzg4IDUuMTAwMTkgMTQ4LjI2MSA2LjA0NzEzIDE0OC4yNjEgOC4wNzc4QzE0OC4yNjEgMTAuMTQ5NyAxNDcuMzg4IDExLjA4NDggMTQ1Ljc0NCAxMS4wODQ4SDE0NC41MTVWNS4xMDAxOVoiIGZpbGw9IiM0MDUxNjQiLz48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTE3NC43MDQgMjUuNTU5OUgxODAuMjgzTDE4NiAwSDE4MC40MjJMMTc0LjcwNCAyNS41NTk5WiIgZmlsbD0iIzk5QTMxOSIvPjwvc3ZnPg==" alt="VHV Gruppe"></div>
+      <nav class="main-nav">
+        <a data-nav="home" onclick="navigate('home')">Startseite</a>
+        <a data-nav="plp" onclick="navigate('plp')">Alle Produkte</a>
+        <a data-nav="faq" onclick="navigate('faq')">FAQ</a>
+      </nav>
       <div class="hdr-btns">
         <button class="btn-hdr" id="co-cart-btn" onclick="openCart(false)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
