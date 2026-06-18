@@ -34,6 +34,7 @@
     .header {
       position: sticky; top: 0; z-index: 300;
       height: 72px; background: #fff;
+      margin-top: 56px; /* Abstand zum oberen Rand */
       border-bottom: none; /* border only when scrolled (see JS) */
     }
     .header.scrolled { border-bottom: 1px solid var(--g20); }
@@ -53,12 +54,10 @@
     .hdr-btns { display: flex; gap: 12px; }
     /* Hauptnavigation: mittig zwischen Logo und Meta-Buttons */
     .main-nav { display: flex; gap: 40px; align-items: center; }
-    .main-nav a { font-size: 18px; font-weight: 500; color: var(--gtxt); cursor: pointer; text-decoration: none; padding: 6px 0; border-bottom: 2px solid transparent; white-space: nowrap; transition: color .15s; }
-    .main-nav a:hover { color: var(--orange); }
-    .main-nav a.active { color: var(--orange); border-bottom-color: var(--orange); }
-    /* Auf dem grünen Hero dunkler Text */
-    #screen-home .main-nav a { color: var(--navy); }
-    #screen-home .main-nav a:hover, #screen-home .main-nav a.active { color: var(--orange); }
+    .main-nav a { font-size: 18px; font-weight: 500; color: var(--orange); cursor: pointer; text-decoration: none; padding: 6px 0; border-bottom: 2px solid transparent; white-space: nowrap; transition: color .15s, border-color .15s; }
+    .main-nav a.active { border-bottom-color: currentColor; }
+    /* Startseite: weiße Navigation auf dem grünen Hero */
+    #screen-home .main-nav a { color: #fff; }
     .btn-hdr {
       display: inline-flex; align-items: center; gap: 8px;
       padding: 12px 16px; background: var(--orange); color: #fff;
