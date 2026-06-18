@@ -401,18 +401,18 @@
     /* Step 3: Bestellübersicht */
     .co3-item { display: flex; gap: 20px; align-items: flex-start; padding: 20px 0; border-bottom: 1px solid var(--g20); }
     .co3-item:last-child { border-bottom: none; }
-    .co3-thumb { width: 80px; height: 80px; background: var(--gbg); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border-radius: 2px; }
+    .co3-thumb { width: 96px; height: 96px; background: var(--gbg); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border-radius: 2px; }
     .co3-thumb img { width: 70%; height: 70%; object-fit: contain; }
     .co3-info { flex: 1; }
     .co3-name { font-size: 16px; font-weight: 500; line-height: 22px; color: #405164; }
-    .co3-unit { font-size: 14px; line-height: 20px; color: #9FA8B2; margin-top: 4px; }
-    .co3-qty  { font-size: 14px; line-height: 20px; color: #9FA8B2; margin-top: 4px; }
+    .co3-unit { font-size: 16px; line-height: 24px; color: #9FA8B2; margin-top: 4px; }
+    .co3-qty  { font-size: 16px; line-height: 24px; color: #405164; margin-top: 16px; }
     .co3-price { font-size: 16px; font-weight: 500; color: #405164; white-space: nowrap; }
-    .co3-address-box { background: #fff; border: 1px solid var(--g20); border-radius: 4px; padding: 24px 24px 56px; display: flex; gap: 0; margin-top: 20px; position: relative; }
+    .co3-address-box { background: var(--gbg); border: none; border-radius: 4px; padding: 24px 24px 56px; display: flex; gap: 0; margin-top: 20px; position: relative; }
     .co3-addr-col { flex: 1; padding-right: 32px; }
     .co3-icon { color: var(--orange); margin-bottom: 12px; display: block; }
     .co3-addr-lbl { font-size: 16px; font-weight: 500; color: #405164; margin-bottom: 8px; }
-    .co3-addr-val { font-size: 14px; line-height: 22px; color: #697481; }
+    .co3-addr-val { font-size: 16px; line-height: 24px; color: #697481; }
     .co3-edit { position: absolute; bottom: 20px; right: 24px; color: var(--orange); font-size: 16px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; background: none; border: none; font-family: inherit; }
 
     /* Verbundene Radio-Gruppe (geteilte Borders) */
@@ -1353,6 +1353,8 @@
     updatePaymentForm(idx);
     positionPaymentCaret(el);
   }
+  let voucherApplied = false;
+  const VOUCHER_DISCOUNT = 25.00;
   function toggleVoucher(cb, id) {
     const row = document.getElementById(id);
     if (cb.checked) {
@@ -1369,6 +1371,8 @@
     input.removeAttribute('readonly');
     const btn = row.querySelector('.btn-voucher');
     if (btn) btn.textContent = 'Anwenden';
+    voucherApplied = false;
+    renderCheckoutSummary();
   }
   function applyVoucher(btn) {
     const row = btn.closest('.co-voucher');
@@ -1383,6 +1387,8 @@
       input.setAttribute('readonly', 'readonly');
       row.classList.add('applied');
       btn.textContent = 'Löschen';
+      voucherApplied = true;
+      renderCheckoutSummary();
     }
   }
   /* ── Checkout navigation ── */
@@ -1404,11 +1410,14 @@
     ).join('') + (extraPositions > 0 ? `<span class="co-more">+${extraPositions}</span>` : '');
     // Totals
     const subtotal = cart.reduce((s,i)=>s+PRODUCTS[i.id].price*i.qty, 0);
-    const total = subtotal + 3.90;
+    const discount = voucherApplied ? VOUCHER_DISCOUNT : 0;
+    const total = Math.max(0, subtotal + 3.90 - discount);
     const vat = total * 19 / 119;
     document.getElementById('co-subtotal').textContent = subtotal.toFixed(2).replace('.',',')+' €';
     document.getElementById('co-total').textContent    = total.toFixed(2).replace('.',',')+' €';
     document.getElementById('co-mwst').textContent     = `inkl. MwSt. (${vat.toFixed(2).replace('.',',')} €)`;
+    const vrow = document.getElementById('co-voucher-row');
+    if (vrow) vrow.style.display = voucherApplied ? 'flex' : 'none';
   }
 
   // selectAnrede merged into selectRadio
@@ -1794,6 +1803,7 @@
           <div class="co-sum-h">Zusammenfassung</div>
           <div class="co-row"><span>Zwischensumme</span><span id="co-subtotal">–</span></div>
           <div class="co-row"><span>Versandkosten</span><span>3,90 €</span></div>
+          <div class="co-row" id="co-voucher-row" style="display:none; color: var(--green); font-weight: 500;"><span>Geschenkgutschein angewendet</span><span>– 25,00 €</span></div>
           <hr class="co-div">
           <div class="co-row co-total"><span>Gesamtsumme</span><span id="co-total">–</span></div>
           <div class="co-mwst" id="co-mwst"></div>
