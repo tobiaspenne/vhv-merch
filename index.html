@@ -613,6 +613,49 @@
     .acc-order-btn:hover { background: #d94f00; }
     /* Offcanvas-Schließen (Kreis links) */
     .order-close-x { position: fixed; top: 24px; left: 24px; width: 48px; height: 48px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 402; box-shadow: 0 2px 10px rgba(0,0,0,0.15); color: var(--navy); }
+
+    /* ── LADE-SPINNER (Bestellabschluss) ── */
+    .ld-overlay { display: none; position: fixed; inset: 0; z-index: 500; background: rgba(255,255,255,0.8); align-items: center; justify-content: center; }
+    .ld-overlay.open { display: flex; }
+    .ld-wrap { position: relative; width: 96px; height: 96px; }
+    .ld-sq { position: absolute; left: 26px; top: 26px; width: 44px; height: 44px; transform-origin: center center; }
+    .ld-green { background: var(--green); z-index: 2; animation: ld-green 2.4s infinite both, ld-blur-g 2.4s infinite both; }
+    .ld-blue  { background: var(--tc);    z-index: 1; animation: ld-blue 2.4s infinite both, ld-blur-c 2.4s infinite both; }
+    .ld-amber { background: var(--ta);    z-index: 1; animation: ld-amber 2.4s infinite both, ld-blur-c 2.4s infinite both; }
+    .ld-red   { background: var(--tr);    z-index: 1; animation: ld-red 2.4s infinite both, ld-blur-c 2.4s infinite both; }
+    @keyframes ld-blur-g {
+      0% { filter: blur(3px); } 24% { filter: blur(.4px); } 33% { filter: blur(1.4px); }
+      42% { filter: blur(0); } 60% { filter: blur(0); } 70% { filter: blur(1.4px); } 80%,100% { filter: blur(0); }
+    }
+    @keyframes ld-blur-c {
+      0%,24% { filter: blur(0); } 33% { filter: blur(1.4px); } 42% { filter: blur(0); }
+      60% { filter: blur(0); } 70% { filter: blur(1.4px); } 80%,100% { filter: blur(0); }
+    }
+    @keyframes ld-green {
+      0%   { transform: translate(0,0) rotate(0deg) scale(.72); animation-timing-function: cubic-bezier(.3,.7,.2,1); }
+      24%  { transform: translate(0,0) rotate(90deg) scale(.72); animation-timing-function: cubic-bezier(.34,1.4,.6,1); }
+      42%  { transform: translate(-26px,-26px) rotate(90deg) scale(1); }
+      60%  { transform: translate(-26px,-26px) rotate(90deg) scale(1); animation-timing-function: cubic-bezier(.34,1.4,.6,1); }
+      80%, 100% { transform: translate(0,0) rotate(90deg) scale(.72); }
+    }
+    @keyframes ld-blue {
+      0%, 24% { transform: translate(0,0) scale(.72); opacity:0; animation-timing-function: cubic-bezier(.34,1.4,.6,1); }
+      42%     { transform: translate(26px,-26px) scale(1); opacity:1; }
+      60%     { transform: translate(26px,-26px) scale(1); opacity:1; animation-timing-function: cubic-bezier(.34,1.4,.6,1); }
+      80%, 100% { transform: translate(0,0) scale(.72); opacity:0; }
+    }
+    @keyframes ld-amber {
+      0%, 24% { transform: translate(0,0) scale(.72); opacity:0; animation-timing-function: cubic-bezier(.34,1.4,.6,1); }
+      42%     { transform: translate(-26px,26px) scale(1); opacity:1; }
+      60%     { transform: translate(-26px,26px) scale(1); opacity:1; animation-timing-function: cubic-bezier(.34,1.4,.6,1); }
+      80%, 100% { transform: translate(0,0) scale(.72); opacity:0; }
+    }
+    @keyframes ld-red {
+      0%, 24% { transform: translate(0,0) scale(.72); opacity:0; animation-timing-function: cubic-bezier(.34,1.4,.6,1); }
+      42%     { transform: translate(26px,26px) scale(1); opacity:1; }
+      60%     { transform: translate(26px,26px) scale(1); opacity:1; animation-timing-function: cubic-bezier(.34,1.4,.6,1); }
+      80%, 100% { transform: translate(0,0) scale(.72); opacity:0; }
+    }
   </style>
 </head>
 <body>
@@ -668,6 +711,18 @@
   </div>
   <div class="cart-actions">
     <button class="btn-checkout" onclick="reorder()">Artikel erneut bestellen</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+  LADE-OVERLAY (Bestellabschluss)
+══════════════════════════ -->
+<div class="ld-overlay" id="ld-overlay">
+  <div class="ld-wrap">
+    <div class="ld-sq ld-red"></div>
+    <div class="ld-sq ld-amber"></div>
+    <div class="ld-sq ld-blue"></div>
+    <div class="ld-sq ld-green"></div>
   </div>
 </div>
 
@@ -1632,13 +1687,20 @@
   }
   /* Bestellung abschließen → Danke-Seite */
   function placeOrder() {
-    navigate('thanks');
-    checkoutStep = 1;
-    [1, 2, 3].forEach(n => {
-      const s = document.getElementById('co-step' + n);
-      if (s) s.style.display = (n === 1) ? 'block' : 'none';
-    });
-    updateCheckoutUI();
+    const ov = document.getElementById('ld-overlay');
+    ov.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => {
+      ov.classList.remove('open');
+      document.body.style.overflow = '';
+      navigate('thanks');
+      checkoutStep = 1;
+      [1, 2, 3].forEach(n => {
+        const s = document.getElementById('co-step' + n);
+        if (s) s.style.display = (n === 1) ? 'block' : 'none';
+      });
+      updateCheckoutUI();
+    }, 4800);
   }
   window.addEventListener('load', function() {
     const firstTab = document.querySelector('.co-dtab.sel');
