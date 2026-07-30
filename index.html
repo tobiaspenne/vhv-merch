@@ -478,6 +478,16 @@
     /* PLZ-Eingabe */
     .co-fld-inp { width: 100%; border: 1px solid var(--g20); border-radius: 4px; padding: 16px; font-size: 16px; line-height: 22px; font-family: inherit; color: #9FA8B2; outline: none; margin-bottom: 24px; }
     .co-fld-inp:focus { border-color: var(--orange); color: #405164; }
+    /* Standort-Combobox (Interne Hauspost) */
+    .co-combo { border: 1px solid var(--g20); border-radius: 4px; margin-bottom: 16px; background: #fff; }
+    .co-combo-head { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px; background: none; border: none; font-family: inherit; font-size: 16px; line-height: 24px; color: #405164; text-align: left; cursor: pointer; }
+    .co-combo-chevron { flex-shrink: 0; transition: transform .2s ease; }
+    .co-combo.open .co-combo-chevron { transform: rotate(180deg); }
+    .co-combo-panel { max-height: 0; overflow: hidden; opacity: 0; padding: 0 8px; transition: max-height .28s ease, opacity .2s ease; }
+    .co-combo.open .co-combo-panel { max-height: 260px; opacity: 1; }
+    .co-combo-opt { display: flex; align-items: center; gap: 16px; padding: 12px 8px; border-radius: 4px; cursor: pointer; font-size: 16px; line-height: 22px; color: #405164; }
+    .co-combo-opt:hover { background: #F5F6F7; }
+    .co-combo-txt strong { font-weight: 500; }
 
 
     /* ── WARENKORB SIDEBAR ── */
@@ -1508,6 +1518,21 @@
     el.classList.add('sel');
     el.querySelector('.co-rd').style.display = 'block';
   }
+  /* Standort-Combobox: auf/zu + Auswahl übernehmen */
+  function toggleCombo(headEl) {
+    headEl.closest('.co-combo').classList.toggle('open');
+  }
+  function selectCombo(optEl) {
+    const combo = optEl.closest('.co-combo');
+    combo.querySelectorAll('.co-combo-opt').forEach(o => {
+      o.classList.remove('sel');
+      const rd = o.querySelector('.co-rd'); if (rd) rd.style.display = 'none';
+    });
+    optEl.classList.add('sel');
+    const rd = optEl.querySelector('.co-rd'); if (rd) rd.style.display = 'block';
+    combo.querySelector('.co-combo-label').innerHTML = optEl.querySelector('.co-combo-txt').innerHTML;
+    combo.classList.remove('open');
+  }
 
   function positionDeliveryCaret(tabEl) {
     const notch = document.getElementById('delivery-notch');
@@ -1998,13 +2023,20 @@
               <div class="fld"><input type="text" placeholder=" "><label>Nachname</label></div>
             </div>
             <div class="fld"><input type="text" placeholder=" "><label>Organisationskürzel (z.B. HWI-03)</label></div>
-            <div class="pdp-size-wrap" style="display:block; padding-top:0; margin-bottom:16px; position:relative;">
-              <select class="pdp-size selected">
-                <option value="" selected>Standort</option>
-                <option>Hannover</option><option>Hamburg</option><option>Berlin</option><option>München</option>
-              </select>
-              <div class="pdp-size-chevron" style="top:50%;transform:translateY(-50%);">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            <div class="co-combo" id="combo-standort">
+              <button type="button" class="co-combo-head" onclick="toggleCombo(this)">
+                <span class="co-combo-label">An welchen Standort soll die Bestellung versendet werden?</span>
+                <svg class="co-combo-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="co-combo-panel">
+                <div class="co-combo-opt" onclick="selectCombo(this)">
+                  <span class="co-rc"><span class="co-rd" style="display:none"></span></span>
+                  <span class="co-combo-txt"><strong>VHV München</strong> - Hanauer Str. 22 / 80992 München</span>
+                </div>
+                <div class="co-combo-opt" onclick="selectCombo(this)">
+                  <span class="co-rc"><span class="co-rd" style="display:none"></span></span>
+                  <span class="co-combo-txt"><strong>VHV Berlin</strong> - Siemensdamm 62 / 13627 Berlin</span>
+                </div>
               </div>
             </div>
             <div class="fld"><input type="text" placeholder=" "><label>Straße &amp; Hausnummer</label></div>
