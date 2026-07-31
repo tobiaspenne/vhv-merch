@@ -480,7 +480,12 @@
     .co-fld-inp:focus { border-color: var(--orange); color: #405164; }
     /* Standort-Combobox (Interne Hauspost) */
     .co-combo { border: 1px solid var(--g20); border-radius: 4px; margin-bottom: 16px; background: #fff; }
-    .co-combo-head { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px; background: none; border: none; font-family: inherit; font-size: 16px; line-height: 24px; color: #405164; text-align: left; cursor: pointer; }
+    .co-combo-head { position: relative; width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 22px 16px 8px; min-height: 56px; background: none; border: none; font-family: inherit; font-size: 16px; line-height: 22px; color: #405164; text-align: left; cursor: pointer; }
+    .co-combo-value { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .co-combo-value strong { font-weight: 500; }
+    .co-combo-flabel { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 16px; color: #9FA8B2; pointer-events: none; transition: top .15s ease, font-size .15s ease, transform .15s ease; }
+    .co-combo.open .co-combo-flabel, .co-combo.has-value .co-combo-flabel { top: 8px; transform: none; font-size: 12px; }
+    .co-combo-q { font-size: 14px; line-height: 20px; color: #697481; padding: 6px 8px 8px; }
     .co-combo-chevron { flex-shrink: 0; transition: transform .2s ease; }
     .co-combo.open .co-combo-chevron { transform: rotate(180deg); }
     .co-combo-panel { max-height: 0; overflow: hidden; opacity: 0; padding: 0 8px; transition: max-height .28s ease, opacity .2s ease; }
@@ -1530,7 +1535,8 @@
     });
     optEl.classList.add('sel');
     const rd = optEl.querySelector('.co-rd'); if (rd) rd.style.display = 'block';
-    combo.querySelector('.co-combo-label').innerHTML = optEl.querySelector('.co-combo-txt').innerHTML;
+    combo.querySelector('.co-combo-value').innerHTML = optEl.querySelector('.co-combo-txt').innerHTML;
+    combo.classList.add('has-value');
     combo.classList.remove('open');
   }
 
@@ -2025,10 +2031,12 @@
             <div class="fld"><input type="text" placeholder=" "><label>Organisationskürzel (z.B. HWI-03)</label></div>
             <div class="co-combo" id="combo-standort">
               <button type="button" class="co-combo-head" onclick="toggleCombo(this)">
-                <span class="co-combo-label">An welchen Standort soll die Bestellung versendet werden?</span>
+                <span class="co-combo-value"></span>
+                <label class="co-combo-flabel">Standort</label>
                 <svg class="co-combo-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
               </button>
               <div class="co-combo-panel">
+                <div class="co-combo-q">An welchen Standort soll die Bestellung versendet werden?</div>
                 <div class="co-combo-opt" onclick="selectCombo(this)">
                   <span class="co-rc"><span class="co-rd" style="display:none"></span></span>
                   <span class="co-combo-txt"><strong>VHV München</strong> - Hanauer Str. 22 / 80992 München</span>
